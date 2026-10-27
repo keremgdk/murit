@@ -107,9 +107,13 @@
             <div class="flex justify-between" style="background: #000; border: 1px solid #444; padding: 12px; margin-bottom: 10px; font-size: 13px;">
                 <div>Para: <span id="lblPara" style="font-weight: bold; color: #fff;">0</span></div>
                 <div>Pasif Gelir: <span id="lblPasifGelir" style="font-weight: bold; color: #fff;">0</span>/sn</div>
-                <div>Tık Değeri: <span id="lblVurusGucu" style="font-weight: bold; color: #fff;">1</span></div>
+                <div>Tık Başı Para: <span id="lblTikDegeri" style="font-weight: bold; color: #fff;">1</span></div>
+                <div>Savaş Gücü: <span id="lblVurusGucu" style="font-weight: bold; color: #fff;">1</span></div>
                 <div>Şehir Sayısı: <span id="lblSehirSayisi" style="font-weight: bold; color: #fff;">0</span></div>
             </div>
+
+            <!-- GEÇİCİ SIFIRLAMA BUTONU -->
+           
 
             <!-- Sekme Butonları -->
             <div class="flex" style="gap: 10px; margin-bottom: 15px;">
@@ -118,8 +122,6 @@
                 <button onclick="arsaLiderlikAc()" style="flex: 1;">Zenginler Listesi</button>
             </div>
 
-         
-
             <!-- 1. Market Sekmesi -->
             <div id="sekmeMarket">
                 <button onclick="paraKazan()" style="width: 100%; padding: 15px; font-size: 15px; font-weight: bold; margin-bottom: 15px; background: #002244;">
@@ -127,11 +129,11 @@
                 </button>
                 <div class="grid-2" style="text-align: left;">
                     <div>
-                        <div style="font-size: 12px; color: #888; margin-bottom: 5px;">Silahlar (Tık Değerini Artırır - Sıralı)</div>
+                        <div style="font-size: 12px; color: #888; margin-bottom: 5px;">Silahlar (Sadece Savaş Gücünü Artırır - Sıralı)</div>
                         <div id="silahlarListesi" class="scroll" style="height: 220px;"></div>
                     </div>
                     <div>
-                        <div style="font-size: 12px; color: #888; margin-bottom: 5px;">Eşyalar (Saniyede Pasif Gelir Sağlar - Sıralı)</div>
+                        <div style="font-size: 12px; color: #888; margin-bottom: 5px;">Eşyalar / Mücevherler (Tık Başı Parayı Artırır - Sıralı)</div>
                         <div id="esyalarListesi" class="scroll" style="height: 220px;"></div>
                     </div>
                 </div>
@@ -171,7 +173,7 @@
                 <div style="font-weight: bold; font-size: 18px; margin-bottom: 10px; color: #ff6666;">ŞEHİR SAVAŞI!</div>
                 <div id="savasBilgi" style="font-size: 13px; color: #aaa; margin-bottom: 15px;">Sahip: Kimse</div>
                 <div id="savasSure" style="font-size: 22px; font-weight: bold; margin-bottom: 15px; color: #fff;">Süre: 10 sn</div>
-                <div style="font-size: 13px; margin-bottom: 15px;">Senin Toplam Hasarın: <span id="savasHasarim" style="font-weight: bold; color: #fff;">0</span></div>
+                <div style="font-size: 13px; margin-bottom: 15px;">Senin Toplam Savaş Gücün: <span id="savasHasarim" style="font-weight: bold; color: #fff;">0</span></div>
                 <button onclick="savastaTikla()" style="width: 100%; padding: 25px; font-size: 18px; background: #440000; font-weight: bold;">SALDIR! (Tıkla)</button>
             </div>
         </div>
@@ -180,7 +182,7 @@
         <div id="modalKarsiSavas" class="hidden" style="position: fixed; inset: 0; background: rgba(0,0,0,0.9); display: flex; align-items: center; justify-content: center; z-index: 99;">
             <div class="box" style="text-align: center;">
                 <div style="font-weight: bold; font-size: 18px; margin-bottom: 10px; color: #ff9900;">ŞEHİR KUŞATMA ALTINDA!</div>
-                <div id="karsiSavasBilgi" style="font-size: 13px; color: #aaa; margin-bottom: 15px;">Şehrine saldırıldı! 1 dakika içinde kuştamayı geri çevirmezsen şehir tamamen gidecek.</div>
+                <div id="karsiSavasBilgi" style="font-size: 13px; color: #aaa; margin-bottom: 15px;">Şehrine saldırıldı! 1 dakika içinde kuşatmayı geri çevirmezsen şehir tamamen gidecek.</div>
                 <div id="karsiSavasSure" style="font-size: 22px; font-weight: bold; margin-bottom: 15px; color: #fff;">Kalan Süre: 1:00</div>
                 <div id="savunmaIslemBolumu" class="space-y">
                     <button onclick="kusuamayiGeriCevirBaslat()" style="width: 100%; padding: 18px; background: #003366; font-weight: bold;">KUŞATMAYI GERİ ÇEVİR (10 Sn Savaş Başlat)</button>
@@ -194,7 +196,7 @@
                 <div style="font-weight: bold; font-size: 18px; margin-bottom: 10px; color: #ff6666;">SAVUNMA SAVAŞI (10 SANİYE)!</div>
                 <div id="savunmaSavasBilgi" style="font-size: 13px; color: #aaa; margin-bottom: 15px;">Şehrini korumak için çılgınlar gibi tıkla!</div>
                 <div id="savunmaSavasSure" style="font-size: 22px; font-weight: bold; margin-bottom: 15px; color: #fff;">Süre: 10 sn</div>
-                <div style="font-size: 13px; margin-bottom: 15px;">Senin Toplam Hasarın: <span id="savunmaHasarim" style="font-weight: bold; color: #fff;">0</span></div>
+                <div style="font-size: 13px; margin-bottom: 15px;">Senin Toplam Savaş Gücün: <span id="savunmaHasarim" style="font-weight: bold; color: #fff;">0</span></div>
                 <button onclick="savunmaSavasindaTikla()" style="width: 100%; padding: 25px; font-size: 18px; background: #004400; font-weight: bold;">SAVUN! (Tıkla)</button>
             </div>
         </div>
@@ -280,7 +282,7 @@
             setInterval(haritayiGuncelle, 2000);
             setInterval(karsiSaldiriKontrolEt, 3000);
             setInterval(chatLoglariGetir, 2500);
-            setInterval(pasifGelirIsle, 1000); // Saniyelik pasif gelir
+            setInterval(pasifGelirIsle, 1000); // Saniyelik pasif gelir (yalnızca şehirdeki para yapıları)
         };
 
         function sayiKurut(sayi) {
@@ -493,11 +495,11 @@
 
         const esyaVerileri = [];
         let bazFiyatEsya = 30;
-        let bazPasifEsya = 1;
+        let bazDegerEsya = 1;
         for(let i=0; i<100; i++) {
-            esyaVerileri.push({ id: i+1, ad: `${esyaIsimleri[i]} (Seviye ${i+1})`, fiyat: bazFiyatEsya, pasif: bazPasifEsya });
+            esyaVerileri.push({ id: i+1, ad: `${esyaIsimleri[i]} (Seviye ${i+1})`, fiyat: bazFiyatEsya, deger: bazDegerEsya });
             bazFiyatEsya = Math.floor(bazFiyatEsya * 2.2);
-            bazPasifEsya += Math.floor(bazPasifEsya * 1.4) + 5;
+            bazDegerEsya += Math.floor(bazDegerEsya * 1.3) + 2;
         }
 
         // 5 Mutluluk Yapısı
@@ -520,7 +522,7 @@
 
         let para = 0;
         let mevcutSilahSeviyesi = 1; 
-        let mevcutEsyaSeviyesi = 0; // 0 hiç alınmamış demektir
+        let mevcutEsyaSeviyesi = 0; 
 
         function marketleriOlustur() {
             let silahDiv = document.getElementById("silahlarListesi");
@@ -536,7 +538,7 @@
 
                 silahDiv.innerHTML += `
                     <div class="flex justify-between items-center" style="background: #111; border: 1px solid #444; padding: 8px 12px; margin-bottom: 6px;">
-                        <div><b>${s.ad}</b><br><span style="font-size:11px; color:#7cfc00;">Tık Değeri: +${sayiKurut(s.deger)}</span></div>
+                        <div><b>${s.ad}</b><br><span style="font-size:11px; color:#ff6666;">Savaş Gücü: +${sayiKurut(s.deger)}</span></div>
                         <button ${devreDisi ? 'disabled' : ''} onclick="silahAl(${s.id}, ${s.fiyat})">${butonMetin}</button>
                     </div>
                 `;
@@ -550,7 +552,7 @@
 
                 esyaDiv.innerHTML += `
                     <div class="flex justify-between items-center" style="background: #111; border: 1px solid #444; padding: 8px 12px; margin-bottom: 6px;">
-                        <div><b>${e.ad}</b><br><span style="font-size:11px; color:#ff9900;">Pasif Gelir: +${sayiKurut(e.pasif)}/sn</span></div>
+                        <div><b>${e.ad}</b><br><span style="font-size:11px; color:#7cfc00;">Tık Başı Para: +${sayiKurut(e.deger)}</span></div>
                         <button ${devreDisi ? 'disabled' : ''} onclick="esyaAl(${e.id}, ${e.fiyat})">${butonMetin}</button>
                     </div>
                 `;
@@ -577,27 +579,50 @@
                 marketleriOlustur();
                 arsaGuncelle();
                 arsaKaydet();
-                alert("Eşya alındı, pasif gelir artırıldı!");
+                alert("Eşya (Mücevher/Taç) alındı, tık başı para artırıldı!");
             } else { alert("Paran yetmiyor!"); }
         }
 
-        function getMevcutTikDegeri() {
-            let silah = silahVerileri.find(s => s.id === mevcutSilahSeviyesi);
-            return silah ? silah.deger : 1;
-        }
-
-        function getToplamPasifGelir() {
-            let temelPasif = 0;
+        function getMevcutTikParaDegeri() {
+            let esyaDegeri = 0;
             if (mevcutEsyaSeviyesi > 0) {
                 let esya = esyaVerileri.find(e => e.id === mevcutEsyaSeviyesi);
-                if (esya) temelPasif = esya.pasif;
+                if (esya) esyaDegeri = esya.deger;
             }
-            return temelPasif;
+            return 1 + esyaDegeri;
         }
 
-        function pasifGelirIsle() {
+        function getMevcutSavasGucu() {
+            let silah = silahVerileri.find(s => s.id === mevcutSilahSeviyesi);
+            let silahDegeri = silah ? silah.deger : 1;
+            return silahDegeri;
+        }
+
+        async function getToplamPasifGelir() {
+            if (!aktifKullanici) return 0;
+            try {
+                let res = await fetch(`${firebaseURL}/HaritaSehirler.json`);
+                let data = await res.json() || {};
+                let toplamPasif = 0;
+
+                for (let i = 0; i < 40; i++) {
+                    let sehir = data[i];
+                    if (sehir && sehir.Sahip === aktifKullanici && sehir.Binalar) {
+                        sehir.Binalar.forEach(bId => {
+                            let pYap = paraYapilari.find(p => p.id === bId);
+                            if (pYap) toplamPasif += pYap.pasifKatki;
+                        });
+                    }
+                }
+                return toplamPasif;
+            } catch(e) {
+                return 0;
+            }
+        }
+
+        async function pasifGelirIsle() {
             if (!aktifKullanici) return;
-            let pasif = getToplamPasifGelir();
+            let pasif = await getToplamPasifGelir();
             if (pasif > 0) {
                 para += pasif;
                 arsaGuncelle();
@@ -622,12 +647,21 @@
             grid.innerHTML = "";
 
             let sahipOldugumSehirler = 0;
+            let anlikPasif = 0;
 
             for(let i=0; i<40; i++) {
                 let sehirAdi = sehirIsimleri[i];
                 let sehir = data[i] || { Sahip: "Sahipsiz", Durum: "Normal", Memnuniyet: 100, Binalar: [] };
                 
-                if(sehir.Sahip === aktifKullanici) sahipOldugumSehirler++;
+                if(sehir.Sahip === aktifKullanici) {
+                    sahipOldugumSehirler++;
+                    if(sehir.Binalar) {
+                        sehir.Binalar.forEach(bId => {
+                            let p = paraYapilari.find(x => x.id === bId);
+                            if(p) anlikPasif += p.pasifKatki;
+                        });
+                    }
+                }
 
                 let arkaPlan = "#000";
                 let yaziRenk = "#aaa";
@@ -650,9 +684,10 @@
             }
 
             document.getElementById("lblSehirSayisi").innerText = sahipOldugumSehirler;
-            document.getElementById("lblVurusGucu").innerText = sayiKurut(getMevcutTikDegeri());
-            document.getElementById("lblPasifGelir").innerText = sayiKurut(getToplamPasifGelir());
-            document.getElementById("lblTikParaDegeri").innerText = `(+${sayiKurut(getMevcutTikDegeri())} Para)`;
+            document.getElementById("lblTikDegeri").innerText = sayiKurut(getMevcutTikParaDegeri());
+            document.getElementById("lblVurusGucu").innerText = sayiKurut(getMevcutSavasGucu());
+            document.getElementById("lblPasifGelir").innerText = sayiKurut(anlikPasif);
+            document.getElementById("lblTikParaDegeri").innerText = `(+${sayiKurut(getMevcutTikParaDegeri())} Para)`;
         }
 
         async function sehirTikla(sehirIndex) {
@@ -726,12 +761,6 @@
             let mutYap = mutlulukYapilari.find(m => m.id === binaId);
             if (mutYap) sehir.Memnuniyet = Math.min(100, (sehir.Memnuniyet || 100) + mutYap.etki);
 
-            let pYap = paraYapilari.find(p => p.id === binaId);
-            if (pYap) {
-                if (!sehir.EkstraPasif) sehir.EkstraPasif = 0;
-                sehir.EkstraPasif += pYap.pasifKatki;
-            }
-
             await fetch(`${firebaseURL}/HaritaSehirler/${aktifYonetimSehirIndex}.json`, {
                 method: 'PUT',
                 body: JSON.stringify(sehir)
@@ -771,18 +800,18 @@
         }
 
         function savastaTikla() {
-            savasHasarim += getMevcutTikDegeri();
+            savasHasarim += getMevcutSavasGucu();
             document.getElementById("savasHasarim").innerText = sayiKurut(savasHasarim);
         }
 
         async function savasBitir(sehirIndex, eskiSahip) {
             document.getElementById("modalSavas").classList.add("hidden");
 
-            let rakipHasar = Math.floor(Math.random() * (getMevcutTikDegeri() * 15)) + 15;
+            let rakipHasar = Math.floor(Math.random() * (getMevcutSavasGucu() * 15)) + 15;
             let savasKazandi = savasHasarim >= rakipHasar;
 
             if (savasKazandi) {
-                let bitisZamani = Date.now() + 60000; // 1 Dakikalık Kuşatma Savunma Süresi
+                let bitisZamani = Date.now() + 60000; 
                 await fetch(`${firebaseURL}/HaritaSehirler/${sehirIndex}.json`, {
                     method: 'PUT',
                     body: JSON.stringify({ 
@@ -872,7 +901,7 @@
         }
 
         function savunmaSavasindaTikla() {
-            savunmaHasarim += getMevcutTikDegeri();
+            savunmaHasarim += getMevcutSavasGucu();
             document.getElementById("savunmaHasarim").innerText = sayiKurut(savunmaHasarim);
         }
 
@@ -890,7 +919,7 @@
             if (kazandi) {
                 alert(`Kuşatmayı Başarıyla Geri Çevirdin! Şehir sende kaldı!`);
             } else {
-                alert(`Savunma Başarısız! Yeterli hasarı veremedin, şehir eski sahibine geçti.`);
+                alert(`Savunma Başarısız! Yeterli gücü veremedin, şehir eski sahibine geçti.`);
             }
             haritayiGuncelle();
         }
@@ -920,16 +949,17 @@
         }
 
         async function paraKazan() {
-            let tikDegeri = getMevcutTikDegeri();
-            para += tikDegeri;
+            let tikParasi = getMevcutTikParaDegeri();
+            para += tikParasi;
             arsaGuncelle();
             arsaKaydet();
         }
 
-        function arsaGuncelle() {
+        async function arsaGuncelle() {
             document.getElementById("lblPara").innerText = sayiKurut(para);
-            document.getElementById("lblPasifGelir").innerText = sayiKurut(getToplamPasifGelir());
-            document.getElementById("lblVurusGucu").innerText = sayiKurut(getMevcutTikDegeri());
+            document.getElementById("lblPasifGelir").innerText = sayiKurut(await getToplamPasifGelir());
+            document.getElementById("lblTikDegeri").innerText = sayiKurut(getMevcutTikParaDegeri());
+            document.getElementById("lblVurusGucu").innerText = sayiKurut(getMevcutSavasGucu());
         }
 
         async function arsaKaydet() {
