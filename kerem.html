@@ -1,0 +1,1126 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>muritoyunu</title>
+    <style>
+        body { background: #000; color: #ddd; font-family: Arial, sans-serif; margin: 0; display: flex; height: 100vh; font-size: 14px; }
+        aside { width: 320px; background: #111; border-right: 1px solid #444; padding: 20px; display: flex; flex-direction: column; justify-content: space-between; }
+        main { flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; position: relative; padding: 30px; }
+        button { background: #222; color: #fff; border: 1px solid #555; padding: 10px 18px; cursor: pointer; font-family: Arial, sans-serif; font-size: 13px; font-weight: bold; }
+        button:hover { background: #444; }
+        input, textarea { background: #000; color: #fff; border: 1px solid #555; padding: 10px; font-family: Arial, sans-serif; font-size: 13px; }
+        .box { background: #111; border: 1px solid #444; padding: 30px; width: 100%; max-width: 500px; }
+        .wide-box { background: #111; border: 1px solid #444; padding: 30px; width: 100%; max-width: 1000px; }
+        .hidden { display: none !important; }
+        .flex { display: flex; }
+        .justify-between { justify-content: space-between; }
+        .items-center { align-items: center; }
+        .space-y > * + * { margin-top: 12px; }
+        .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; }
+        .grid-sehir { display: grid; grid-template-columns: repeat(8, 1fr); gap: 8px; }
+        .grid-xox { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; }
+        .scroll { max-height: 280px; overflow-y: auto; border: 1px solid #444; padding: 8px; background: #000; }
+    </style>
+</head>
+<body>
+
+    <!-- SOL SABIT MURITLER PANOSU VE CHAT LOG -->
+    <aside id="solAside">
+        <div>
+            <div style="font-weight: bold; font-size: 15px; margin-bottom: 8px; color: #fff;">MURITLER Tablosu</div>
+            <div style="font-size: 12px; color: #888; margin-bottom: 15px;">muritlerimizin ayak numaraları</div>
+            <div id="solPanoListesi" class="space-y scroll" style="max-height: calc(50vh - 80px);"></div>
+            
+            <!-- Chat Log Bölümü (Müritler Tablosunun Altı) -->
+            <div style="margin-top: 20px; border-top: 1px solid #333; padding-top: 15px;">
+                <div style="font-weight: bold; font-size: 14px; margin-bottom: 8px; color: #fff;">Chat Log</div>
+                <div id="chatLogListesi" class="scroll" style="height: 140px; margin-bottom: 8px; font-size: 12px;">
+                    <div style="color: #666;">Giriş yapınca sohbet açılır...</div>
+                </div>
+                <div id="chatInputBolumu" class="flex hidden" style="gap: 6px;">
+                    <input type="text" id="txtChatMesaj" placeholder="Mesaj yaz..." style="flex: 1; padding: 6px; font-size: 12px;" onkeydown="if(event.key==='Enter')chatMesajGonder()">
+                    <button onclick="chatMesajGonder()" style="padding: 6px 12px; font-size: 12px;">Gönder</button>
+                </div>
+            </div>
+        </div>
+        <div style="font-size: 11px; color: #666; border-top: 1px solid #333; padding-top: 8px; margin-top: 10px;">Sistem aktif</div>
+    </aside>
+
+    <!-- SAG ANA ICERIK ALANI -->
+    <main>
+
+        <!-- UST BAR -->
+        <div id="topBar" class="hidden" style="position: absolute; top: 20px; right: 20px; background: #111; border: 1px solid #444; padding: 10px 15px; font-size: 13px; display: flex; align-items: center; gap: 10px;">
+            <span id="userDisplay" style="color: #fff; font-weight: bold;">Misafir</span>
+            <button onclick="sayfayiGuncelle()">🔄 Yenile</button>
+            <button onclick="anaMenuDon()">Menu</button>
+            <button onclick="cikisYap()" style="color: #ff6666;">Cikis</button>
+        </div>
+
+        <!-- GIRIS / KAYIT EKRANI -->
+        <div id="loginScreen" class="box">
+            <div id="formTitle" style="font-weight: bold; font-size: 18px; margin-bottom: 8px;">Giris Yap</div>
+            <div style="font-size: 12px; color: #888; margin-bottom: 20px;">bilgileri gir</div>
+            
+            <div class="space-y">
+                <input type="text" id="txtKadi" placeholder="Kullanici Adi" style="width: 100%; box-sizing: border-box;">
+                <input type="password" id="txtSifre" placeholder="Sifre" style="width: 100%; box-sizing: border-box;">
+                <button id="actionBtn" onclick="girisYap()" style="width: 100%;">Giris Yap</button>
+                <button onclick="formuDegistir()" id="toggleBtn" style="width: 100%; background: transparent; border: none; text-decoration: underline; color: #aaa;">Hesabin yok mu? Kayit ol</button>
+            </div>
+        </div>
+
+        <!-- ANA MENU -->
+        <div id="mainMenu" class="box hidden" style="text-align: center;">
+            <div style="font-weight: bold; font-size: 18px; margin-bottom: 20px;">Oyun Secimi</div>
+            <div class="space-y">
+                <button onclick="sayfayiGuncelle()" style="width: 100%; text-align: left; background: #333; margin-top: 10px;">🔄 Sayfayı Yenile</button>
+                <button onclick="oyunSec('cps')" style="width: 100%; text-align: left;">1. CPS Tester</button>
+                <button onclick="oyunSec('arsa')" style="width: 100%; text-align: left;">2. Görgöz Oyunu (Şehir Savaşları)</button>
+                <button onclick="oyunSec('ayak')" style="width: 100%; text-align: left;">3. Ayak Numarasi Tablosu</button>
+                <button onclick="oyunSec('feedback')" style="width: 100%; text-align: left;">4. Oyuncu Feedback</button>
+                <button onclick="oyunSec('xox')" style="width: 100%; text-align: left; background: #002244;">5. XOX Savaşı (Oda Kur / Katıl)</button>
+            </div>
+        </div>
+
+        <!-- 1. CPS TESTER -->
+        <div id="gameCps" class="box hidden">
+            <div style="font-weight: bold; font-size: 16px; margin-bottom: 15px;">CPS Tester</div>
+            <div class="flex" style="gap: 15px; margin-bottom: 15px;">
+                <button id="btnTiklaCps" onclick="cpsTikla()" style="flex: 1; height: 75px; font-size: 15px; font-weight: bold;">TIKLA (5 sn)</button>
+                <div style="width: 110px; background: #000; border: 1px solid #444; padding: 10px; text-align: center; font-size: 12px; display: flex; flex-direction: column; justify-content: center;">
+                    <div id="lblSure">5 sn</div>
+                    <div id="lblTiklama" style="font-weight: bold; margin-top: 5px;">Tik: 0</div>
+                </div>
+            </div>
+            <div style="font-size: 12px; color: #888; margin-bottom: 8px;">Skor Tablosu</div>
+            <div id="lstCpsSkorlar" class="scroll" style="height: 140px;"></div>
+        </div>
+
+        <!-- 2. GÖRGÖZ OYUNU -->
+        <div id="gameArsa" class="wide-box hidden" style="text-align: center;">
+            <div style="font-weight: bold; font-size: 16px; margin-bottom: 10px;">Görgöz Oyunu (Şehir Savaşları)</div>
+            
+            <div class="flex justify-between" style="background: #000; border: 1px solid #444; padding: 12px; margin-bottom: 10px; font-size: 13px;">
+                <div>Para: <span id="lblPara" style="font-weight: bold; color: #fff;">0</span></div>
+                <div>Pasif Gelir: <span id="lblPasifGelir" style="font-weight: bold; color: #fff;">0</span>/sn</div>
+                <div>Silah Hasarı: <span id="lblVurusGucu" style="font-weight: bold; color: #fff;">1</span></div>
+                <div>Şehir Sayısı: <span id="lblSehirSayisi" style="font-weight: bold; color: #fff;">0</span></div>
+            </div>
+
+            <!-- Sekme Butonları -->
+            <div class="flex" style="gap: 10px; margin-bottom: 15px;">
+                <button onclick="gorgozSekme('market')" style="flex: 1;">Silah & Arsa Market</button>
+                <button onclick="gorgozSekme('harita')" style="flex: 1;">Şehirler Haritası (40 İl)</button>
+                <button onclick="arsaLiderlikAc()" style="flex: 1;">Zenginler Listesi</button>
+            </div>
+
+            <!-- 1. Market Sekmesi -->
+            <div id="sekmeMarket">
+                <button onclick="paraKazan()" style="width: 100%; padding: 15px; font-size: 15px; font-weight: bold; margin-bottom: 15px;">
+                    PARA KAZAN (TIKLA) <span id="lblTikParaDegeri" style="color: #aaa;">(+1 Para)</span>
+                </button>
+                <div class="grid-2" style="text-align: left;">
+                    <div>
+                        <div style="font-size: 12px; color: #888; margin-bottom: 5px;">Silahlar (Vuruş Gücü)</div>
+                        <div id="silahlarListesi" class="scroll" style="height: 220px;"></div>
+                    </div>
+                    <div>
+                        <div style="font-size: 12px; color: #888; margin-bottom: 5px;">Arsalar (Pasif Para Kaynağı)</div>
+                        <div id="arsalarListesi" class="scroll" style="height: 220px;"></div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 2. Şehirler Haritası Sekmesi (40 İl) -->
+            <div id="sekmeHarita" class="hidden">
+                <div style="font-size: 12px; color: #888; margin-bottom: 10px;">Sahipsiz şehirlere tıkla al. Sahipli şehirlerin üstüne tıklayarak savaş başlat!</div>
+                <div id="gridSehirler" class="grid-sehir scroll" style="max-height: 300px; padding: 10px;"></div>
+            </div>
+        </div>
+
+        <!-- SAVAŞ EKRANI MODAL -->
+        <div id="modalSavas" class="hidden" style="position: fixed; inset: 0; background: rgba(0,0,0,0.9); display: flex; align-items: center; justify-content: center; z-index: 99;">
+            <div class="box" style="text-align: center;">
+                <div style="font-weight: bold; font-size: 18px; margin-bottom: 10px; color: #ff6666;">ŞEHİR SAVAŞI!</div>
+                <div id="savasBilgi" style="font-size: 13px; color: #aaa; margin-bottom: 15px;">Sahip: Kimse</div>
+                <div id="savasSure" style="font-size: 22px; font-weight: bold; margin-bottom: 15px; color: #fff;">Süre: 10 sn</div>
+                <div style="font-size: 13px; margin-bottom: 15px;">Senin Toplam Hasarın: <span id="savasHasarim" style="font-weight: bold; color: #fff;">0</span></div>
+                <button onclick="savastaTikla()" style="width: 100%; padding: 25px; font-size: 18px; background: #440000; font-weight: bold;">SALDIR! (Tıkla)</button>
+            </div>
+        </div>
+
+        <!-- KARŞI SALDIRI / SAVUNMA MODAL (10 DAKİKA SÜRELİ) -->
+        <div id="modalKarsiSavas" class="hidden" style="position: fixed; inset: 0; background: rgba(0,0,0,0.9); display: flex; align-items: center; justify-content: center; z-index: 99;">
+            <div class="box" style="text-align: center;">
+                <div style="font-weight: bold; font-size: 18px; margin-bottom: 10px; color: #ff9900;">ŞEHİR KARŞI SALDIRISI (SAVUNMA)!</div>
+                <div id="karsiSavasBilgi" style="font-size: 13px; color: #aaa; margin-bottom: 15px;">Şehir saldırıya uğradı! Cevap ver.</div>
+                <div id="karsiSavasSure" style="font-size: 22px; font-weight: bold; margin-bottom: 15px; color: #fff;">Kalan Süre: 10:00</div>
+                <div style="font-size: 13px; margin-bottom: 15px;">Tek Deneme Hakkın Var! Hasarın: <span id="karsiSavasHasarim" style="font-weight: bold; color: #fff;">0</span></div>
+                <button id="btnKarsiSaldir" onclick="karsiSaldirVur()" style="width: 100%; padding: 25px; font-size: 18px; background: #003366; font-weight: bold;">TEK ATIŞ YAP (SALDIR)!</button>
+            </div>
+        </div>
+
+        <!-- 5. XOX SAVAŞI OYUNU -->
+        <div id="gameXox" class="box hidden" style="text-align: center; max-width: 450px;">
+            <div style="font-weight: bold; font-size: 18px; margin-bottom: 10px;">XOX Savaş Odaları</div>
+            
+            <!-- Lobi Ekranı -->
+            <div id="xoxLobi">
+                <button onclick="xoxOdaKur()" style="width: 100%; margin-bottom: 15px; background: #003366;">Yeni XOX Odası Kur</button>
+                <div style="font-size: 12px; color: #888; margin-bottom: 8px; text-align: left;">Aktif XOX Odaları:</div>
+                <div id="lstXoxOdalar" class="scroll" style="height: 180px; text-align: left;"></div>
+            </div>
+
+            <!-- Oyun Alanı -->
+            <div id="xoxOyunAlani" class="hidden">
+                <div class="flex justify-between" style="font-size: 12px; margin-bottom: 10px; background: #000; padding: 8px; border: 1px solid #444;">
+                    <div>X (1. Oyuncu): <span id="xoxP1" style="color:#7cfc00;">-</span></div>
+                    <div>O (2. Oyuncu): <span id="xoxP2" style="color:#8888ff;">Bekleniyor</span></div>
+                </div>
+                <div id="xoxSiraDurum" style="font-size: 13px; margin-bottom: 15px; font-weight: bold; color: #ff9900;">Sıra: Bekleniyor...</div>
+                
+                <!-- 3x3 XOX Tahtası -->
+                <div id="gridXoxTahta" class="grid-xox" style="margin-bottom: 15px;"></div>
+
+                <button onclick="xoxLobiyeDon()" style="width: 100%; background: #333;">Lobiye Dön</button>
+            </div>
+        </div>
+
+        <!-- 3. AYAK NUMARASI -->
+        <div id="gameAyak" class="box hidden" style="text-align: center;">
+            <div style="font-weight: bold; font-size: 16px; margin-bottom: 8px;">Ayak Numarasi Masasi</div>
+            <div style="font-size: 12px; color: #888; margin-bottom: 15px;">bir kere yazilir, degistirilmez</div>
+            
+            <div id="ayakInputBolumu" class="flex" style="gap: 8px; margin-bottom: 15px;">
+                <input type="number" id="txtAyakNo" placeholder="Ayak no (orn: 42)" style="flex: 1;">
+                <button onclick="ayakNumarasiKaydet()">Kaydet</button>
+            </div>
+            <div id="ayakKilitMesaji" class="hidden" style="font-size: 12px; color: #fff; background: #000; border: 1px solid #444; padding: 10px; margin-bottom: 15px;">
+                Numara tescillendi, degistirilemez.
+            </div>
+        </div>
+
+        <!-- 4. OYUNCU FEEDBACK -->
+        <div id="gameFeedback" class="box hidden" style="text-align: center; max-width: 600px;">
+            <div style="font-weight: bold; font-size: 16px; margin-bottom: 8px;">Oyuncu Feedback</div>
+            <div style="font-size: 12px; color: #888; margin-bottom: 15px;">goruslerini ve mesajini birak</div>
+            
+            <div class="space-y" style="margin-bottom: 15px;">
+                <input type="text" id="fbAd" placeholder="Ad" style="width: 100%; box-sizing: border-box;">
+                <input type="text" id="fbSoyad" placeholder="Soyad" style="width: 100%; box-sizing: border-box;">
+                <input type="text" id="fbKadi" placeholder="Kullanici Adi" style="width: 100%; box-sizing: border-box;">
+                <input type="email" id="fbGmail" placeholder="Gmail" style="width: 100%; box-sizing: border-box;">
+                <textarea id="fbMesaj" placeholder="Mesajin (Max 144 karakter)" maxlength="144" rows="3" style="width: 100%; box-sizing: border-box; resize: none;"></textarea>
+                <button onclick="feedbackGonder()" style="width: 100%;">Gonder</button>
+            </div>
+
+            <div style="font-size: 12px; color: #888; margin-bottom: 8px; text-align: left;">Gelen Feedbackler</div>
+            <div id="lstFeedback" class="scroll" style="height: 150px; text-align: left;"></div>
+        </div>
+
+    </main>
+
+    <!-- ZENGINLER MODAL -->
+    <div id="modalZenginler" class="hidden" style="position: fixed; inset: 0; background: rgba(0,0,0,0.85); display: flex; align-items: center; justify-content: center;">
+        <div class="box">
+            <div style="font-weight: bold; font-size: 16px; margin-bottom: 12px;">Zenginler Listesi</div>
+            <div id="lstZenginler" class="scroll" style="height: 200px; margin-bottom: 15px;"></div>
+            <button onclick="document.getElementById('modalZenginler').classList.add('hidden')" style="width: 100%;">Kapat</button>
+        </div>
+    </div>
+
+    <script>
+        const firebaseURL = "https://oyundata3131-default-rtdb.firebaseio.com/";
+        let aktifKullanici = "";
+        let kayitModu = false;
+
+        window.onload = function() {
+            solPanoyuGuncelle();
+            marketleriOlustur();
+            setInterval(solPanoyuGuncelle, 3000);
+            setInterval(haritayiGuncelle, 2000);
+            setInterval(karsiSaldiriKontrolEt, 3000);
+            setInterval(chatLoglariGetir, 2500);
+        };
+
+        function sayiKurut(sayi) {
+            if (sayi === undefined || sayi === null || isNaN(sayi)) return "0";
+            if (sayi < 1000) return Math.floor(sayi).toString();
+
+            const birimler = ["", "bin", "milyon", "milyar", "trilyon", "katrilyon", "kentilyon", "sekstilyon", "septilyon", "oktilyon", "nonilyon", "desilyon"];
+            let basamak = Math.floor(Math.log10(sayi) / 3);
+            if (basamak >= birimler.length) basamak = birimler.length - 1;
+
+            let bolum = sayi / Math.pow(10, basamak * 3);
+            return bolum.toFixed(2) + " " + birimler[basamak];
+        }
+
+        // --- CHAT LOG SİSTEMİ ---
+        async function chatLoglariGetir() {
+            try {
+                let res = await fetch(`${firebaseURL}/ChatLog.json`);
+                let data = await res.json() || {};
+                let div = document.getElementById("chatLogListesi");
+                div.innerHTML = "";
+
+                let mesajlar = Object.values(data);
+                if (mesajlar.length > 0) {
+                    // Son 50 mesajı göster
+                    mesajlar.slice(-50).forEach(m => {
+                        div.innerHTML += `<div style="border-bottom: 1px solid #222; padding: 4px 0;"><span style="color: #7cfc00; font-weight: bold;">${m.Gonderen}:</span> <span style="color: #ddd;">${m.Mesaj}</span></div>`;
+                    });
+                    div.scrollTop = div.scrollHeight;
+                } else {
+                    div.innerHTML = "<div style='color: #666;'>Henüz mesaj yok.</div>";
+                }
+            } catch(e) {}
+        }
+
+        async function chatMesajGonder() {
+            let inp = document.getElementById("txtChatMesaj");
+            let mesaj = inp.value.trim();
+            if(!mesaj || !aktifKullanici) return;
+
+            let yeniMesaj = {
+                Gonderen: aktifKullanici,
+                Mesaj: mesaj,
+                Zaman: Date.now()
+            };
+
+            await fetch(`${firebaseURL}/ChatLog.json`, {
+                method: 'POST',
+                body: JSON.stringify(yeniMesaj)
+            });
+
+            inp.value = "";
+            chatLoglariGetir();
+        }
+
+        // --- XOX SAVAŞ SİSTEMİ ---
+        let aktifXoxOdaId = null;
+        let xoxKontrolTimer = null;
+
+        async function xoxOdalariniGetir() {
+            let res = await fetch(`${firebaseURL}/XoxOdalar.json`);
+            let data = await res.json() || {};
+            let div = document.getElementById("lstXoxOdalar");
+            div.innerHTML = "";
+
+            let odaVar = false;
+            for(let id in data) {
+                let oda = data[id];
+                if(oda.Durum === "Bekliyor") {
+                    odaVar = true;
+                    div.innerHTML += `
+                        <div class="flex justify-between items-center" style="border-bottom: 1px solid #333; padding: 6px 0;">
+                            <span><b>${oda.Kurucu}</b>'nun Odası</span>
+                            <button onclick="xoxOdayaKatil('${id}')">Katıl</button>
+                        </div>
+                    `;
+                }
+            }
+            if(!odaVar) {
+                div.innerHTML = "<div style='color: #666;'>Aktif XOX odası yok. Yeni kurabilirsin!</div>";
+            }
+        }
+
+        async function xoxOdaKur() {
+            let yeniOda = {
+                Kurucu: aktifKullanici,
+                Katilimci: "Bekleniyor",
+                Durum: "Bekliyor",
+                Sira: aktifKullanici,
+                Kazanan: "",
+                Tahta: Array(9).fill("")
+            };
+            let res = await fetch(`${firebaseURL}/XoxOdalar.json`, {
+                method: 'POST',
+                body: JSON.stringify(yeniOda)
+            });
+            let data = await res.json();
+            aktifXoxOdaId = data.name;
+            xoxOyunuBaslatEkrani();
+        }
+
+        async function xoxOdayaKatil(odaId) {
+            aktifXoxOdaId = odaId;
+            let res = await fetch(`${firebaseURL}/XoxOdalar/${odaId}.json`);
+            let oda = await res.json();
+            if(oda.Kurucu === aktifKullanici) {
+                xoxOyunuBaslatEkrani();
+                return;
+            }
+            await fetch(`${firebaseURL}/XoxOdalar/${odaId}.json`, {
+                method: 'PATCH',
+                body: JSON.stringify({ Katilimci: aktifKullanici, Durum: "Oynaniyor" })
+            });
+            xoxOyunuBaslatEkrani();
+        }
+
+        function xoxOyunuBaslatEkrani() {
+            document.getElementById("xoxLobi").classList.add("hidden");
+            document.getElementById("xoxOyunAlani").classList.remove("hidden");
+            xoxVerileriSenkronizeEt();
+            xoxKontrolTimer = setInterval(xoxVerileriSenkronizeEt, 1500);
+        }
+
+        function xoxLobiyeDon() {
+            clearInterval(xoxKontrolTimer);
+            aktifXoxOdaId = null;
+            document.getElementById("xoxLobi").classList.remove("hidden");
+            document.getElementById("xoxOyunAlani").classList.add("hidden");
+            xoxOdalariniGetir();
+        }
+
+        async function xoxVerileriSenkronizeEt() {
+            if(!aktifXoxOdaId) return;
+            let res = await fetch(`${firebaseURL}/XoxOdalar/${aktifXoxOdaId}.json`);
+            let oda = await res.json();
+            if(!oda) return;
+
+            document.getElementById("xoxP1").innerText = oda.Kurucu;
+            document.getElementById("xoxP2").innerText = oda.Katilimci;
+
+            if(oda.Durum === "Bekliyor") {
+                document.getElementById("xoxSiraDurum").innerText = "Rakip bekleniyor...";
+                return;
+            }
+
+            if(oda.Kazanan) {
+                if(oda.Kazanan === "Berabere") {
+                    document.getElementById("xoxSiraDurum").innerText = "OYUN BİTTİ: Berabere!";
+                } else {
+                    document.getElementById("xoxSiraDurum").innerText = `KAZANAN: ${oda.Kazanan}!`;
+                }
+                document.getElementById("xoxSiraDurum").style.color = "#ff3333";
+            } else if(oda.Sira === aktifKullanici) {
+                document.getElementById("xoxSiraDurum").innerText = "SIRA SENDE!";
+                document.getElementById("xoxSiraDurum").style.color = "#7cfc00";
+            } else {
+                document.getElementById("xoxSiraDurum").innerText = `Sıra: ${oda.Sira}'da`;
+                document.getElementById("xoxSiraDurum").style.color = "#ff9900";
+            }
+
+            let grid = document.getElementById("gridXoxTahta");
+            grid.innerHTML = "";
+            let tahta = oda.Tahta || Array(9).fill("");
+
+            for(let i=0; i<9; i++) {
+                let h = tahta[i] || "";
+                grid.innerHTML += `
+                    <button onclick="xoxKareyeTikla(${i})" style="height: 60px; font-size: 24px; font-weight: bold; background: ${h ? '#222' : '#050505'}; color: ${h === 'X' ? '#7cfc00' : '#8888ff'};">
+                        ${h}
+                    </button>
+                `;
+            }
+        }
+
+        async function xoxKareyeTikla(index) {
+            let res = await fetch(`${firebaseURL}/XoxOdalar/${aktifXoxOdaId}.json`);
+            let oda = await res.json();
+
+            if(oda.Durum !== "Oynaniyor" || oda.Kazanan) return;
+            if(oda.Sira !== aktifKullanici) {
+                alert("Sıra sende değil!");
+                return;
+            }
+            let tahta = oda.Tahta || Array(9).fill("");
+            if(tahta[index] !== "") {
+                alert("Bu kare dolu!");
+                return;
+            }
+
+            let sembol = (aktifKullanici === oda.Kurucu) ? "X" : "O";
+            tahta[index] = sembol;
+
+            let kazanan = "";
+            const kazanmaKombinasyonlari = [
+                [0,1,2], [3,4,5], [6,7,8], 
+                [0,3,6], [1,4,7], [2,5,8], 
+                [0,4,8], [2,4,6]  
+            ];
+
+            for(let k of kazanmaKombinasyonlari) {
+                if(tahta[k[0]] && tahta[k[0]] === tahta[k[1]] && tahta[k[0]] === tahta[k[2]]) {
+                    kazanan = aktifKullanici;
+                }
+            }
+
+            if(!kazanan && !tahta.includes("")) {
+                kazanan = "Berabere";
+            }
+
+            let sonrakiSira = (oda.Sira === oda.Kurucu) ? oda.Katilimci : oda.Kurucu;
+
+            await fetch(`${firebaseURL}/XoxOdalar/${aktifXoxOdaId}.json`, {
+                method: 'PATCH',
+                body: JSON.stringify({ Tahta: tahta, Sira: sonrakiSira, Kazanan: kazanan })
+            });
+
+            xoxVerileriSenkronizeEt();
+        }
+
+        // --- ŞEHİR SAVAŞLARI VE DİĞER KISIMLAR ---
+        const sehirIsimleri = [
+            "İstanbul", "Ankara", "İzmir", "Bursa", "Antalya", "Adana", "Konya", "Gaziantep", "Şanlıurfa", "Mersin",
+            "Kocaeli", "Diyarbakır", "Hatay", "Manisa", "Kayseri", "Samsun", "Balıkesir", "Kahramanmaraş", "Van", "Aydın",
+            "Tekirdağ", "Sakarya", "Muğla", "Eskişehir", "Mardin", "Denizli", "Trabzon", "Malatya", "Erzurum", "Ordu",
+            "Afyonkarahisar", "Sivas", "Adıyaman", "Tokat", "Zonguldak", "Çanakkale", "Şırnak", "Elazığ", "Kütahya", "Osmaniye"
+        ];
+
+        const silahIsimleri = [
+            "Paslu Kanca", "Tahta Sopa", "Demir Çubuk", "Kırık Bıçak", "Avcı Hançeri", "Kısa Kama", "Bakır Kılıç", "Tunç Kılıç", "Keskin Pala", "Çelik Kılıç",
+            "Usta Kılıcı", "Gladyatör Kılıcı", "Savaş Baltası", "İki Ağızlı Balta", "Karakoncoloz", "Zehirli Hançer", "Ejder Dişi", "Kalkan Kıran", "Ateş Palası", "Buz Kılıcı",
+            "Yıldırım Kılıcı", "Gölge Bıçağı", "Kanlı Kama", "Karanlık Mızrak", "Şövalye Kılıcı", "Kraliyet Kılıcı", "Titan Kesici", "Kıyamet Baltası", "Ruh Emici", "Kadim Kılıç",
+            "Güneş Kılıcı", "Ay Işığı", "Meteor Parçası", "Cehennem Ateşi", "Buzul Mızrağı", "Fırtına Kılıcı", "Anafor Silahı", "Vorteks Kılıcı", "Atom Parçalayıcı", "Kuantum Bıçak",
+            "Antimadde Kılıcı", "Karadelik Topu", "Süpernova Bıçağı", "Galaksi Kesici", "Evrensel Kılıç", "Tanrısal Asalar", "Sonsuzluk Kılıcı", "Kıtalar Arası Kılıç", "Kozmik Balta", "Ölümsüzlük Kılıcı",
+            "Destansı Kılıç", "Mitolojik Kama", "Efsanevi Pala", "Yaratan Kılıç", "Yıkıcı Balta", "Korku Salan", "Hükümdar Kılıcı", "İmparator Bıçağı", "Sultan Kılıcı", "Şahane Kama",
+            "Göz Kamaştıran", "Zırh Delen", "Kafa Kesici", "Kan Dökücü", "Canavar Avcısı", "Ejderha Katili", "Dev Kıran", "Titan Düşüren", "Tanrı Döver", "Kader Çizer",
+            "Zaman Bükücü", "Boyut Kesici", "Kaos Kılıcı", "Düzen Sağlayıcı", "Hakikat Kılıcı", "Yalan Sökmeyen", "Saf Celik", "Elmas Kılıç", "Zümrüt Pala", "Yakut Kama",
+            "Safir Kılıç", "Altın Kaplama", "Gümüş Kılıç", "Platin Balta", "Titanyum Kılıç", "Krom Bıçak", "Nikel Kama", "Çelik Pençe", "Demir Yumruk", "Kaya Kıran",
+            "Dağ Yıkan", "Deprem Kılıcı", "Volkanik Kama", "Lav Püskürten", "Buzul Kesen", "Rüzgar Kanadı", "Kasırga Bıçağı", "Yıldırım Hızı", "Gök Gürültüsü", "Kıyamet Silahı"
+        ];
+        const silahVerileri = [];
+        let bazFiyatSilah = 50;
+        let bazGucSilah = 1;
+        for(let i=0; i<100; i++) {
+            silahVerileri.push({ id: i+1, ad: `${silahIsimleri[i]} (Lvl ${i+1})`, fiyat: bazFiyatSilah, guc: bazGucSilah });
+            bazFiyatSilah = Math.floor(bazFiyatSilah * 2.1);
+            bazGucSilah += Math.floor(bazGucSilah * 1.4) + 5;
+        }
+
+        const arsaIsimleri = [
+            "Boş Arsa", "Küçük Tarla", "Mısır Tarlası", "Buğday Evi", "Kerpiç Ev", "Taş Villa", "Bahçeli Konak", "Lüks Malikane", "Çiftlik Evi", "Bağ Evi",
+            "Küçük Dükkan", "Mahalle Bakkalı", "Manav Dükkanı", "Kasap Dükkanı", "Berber Dükkanı", "Tamirhane", "Depo", "Atölye", "Küçük Fabrika", "Tekstil Atölyesi",
+            "Oto Tamir", "Benzinlik", "Otopark", "Kafeterya", "Çay Ocağı", "Lokanta", "Büfe", "Market Zinciri", "Süpermarket", "AVM Arazisi",
+            "Otel İnşaatı", "Tatil Köyü", "Butik Otel", "Plaj Tesisleri", "Yat Limanı", "Marina", "Liman Arazisi", "Gümrük Binası", "Antrepo", "Lojistik Üssü",
+            "Sanayi Sitesi", "Ağır Sanayi", "Çelik Fabrikası", "Otomobil Fabrikası", "Teknoloji Üssü", "Bilim Merkezi", "Laboratuvar", "Ar-Ge Binası", "Üniversite Kampüsü", "Okul Arazisi",
+            "Hastane Arazisi", "Sağlık Ocağı", "Eczane Zinciri", "Belediye Binası", "Mahkeme Sarayı", "Banka Binası", "Borsa Merkezi", "Finans Kulesi", "Gökdelen Arazisi", "Plaza",
+            "İş Merkezi", "Holding Binası", "Medya Merkezi", "Televizyon Kulesi", "Stüdyo", "Sinema Salonu", "Tiyatro Sahnesi", "Spor Kompleksi", "Futbol Stadyumu", "Basketbol Salonu",
+            "Yüzme Havuzu", "Tenis Kortu", "Golf Sahası", "Yarış Pisti", "Havaalanı", "Helikopter Pisti", "Uzay Üssü", "Uydu İstasyonu", "Radar Üssü", "Askeri Üs",
+            "Kışla", "Silah Deposu", "Nükleer Tesis", "Enerji Santrali", "Baraj Arazisi", "Rüzgar Çiftliği", "Güneş Enerji Tarlası", "Su Kuyusu", "Petrol Kuyusu", "Altın Madeni",
+            "Elmas Madeni", "Kömür Ocağı", "Demir Madeni", "Bakır Ocağı", "Kraliyet Sarayı", "İmparatorluk Konağı", "Saray Bahçesi", "Tapıncak Arazisi", "Kutsal Toprak", "Evrenin Merkezi"
+        ];
+        const arsaVerileri = [];
+        let bazFiyatArsa = 100;
+        let bazPasifArsa = 5;
+        for(let i=0; i<100; i++) {
+            arsaVerileri.push({ id: i+1, ad: `${arsaIsimleri[i]} (Lvl ${i+1})`, fiyat: bazFiyatArsa, pasif: bazPasifArsa });
+            bazFiyatArsa = Math.floor(bazFiyatArsa * 2.2);
+            bazPasifArsa += Math.floor(bazPasifArsa * 1.5) + 10;
+        }
+
+        function marketleriOlustur() {
+            let silahDiv = document.getElementById("silahlarListesi");
+            let arsaDiv = document.getElementById("arsalarListesi");
+            silahDiv.innerHTML = "";
+            arsaDiv.innerHTML = "";
+
+            silahVerileri.forEach(s => {
+                silahDiv.innerHTML += `
+                    <div class="flex justify-between items-center" style="background: #111; border: 1px solid #444; padding: 8px 12px; margin-bottom: 6px;">
+                        <div><b>${s.ad}</b><br><span style="font-size:11px; color:#aaa;">Hasar: +${sayiKurut(s.guc)}</span></div>
+                        <button onclick="silahAl(${s.fiyat}, ${s.guc})">Al (${sayiKurut(s.fiyat)})</button>
+                    </div>
+                `;
+            });
+
+            arsaVerileri.forEach(a => {
+                arsaDiv.innerHTML += `
+                    <div class="flex justify-between items-center" style="background: #111; border: 1px solid #444; padding: 8px 12px; margin-bottom: 6px;">
+                        <div><b>${a.ad}</b><br><span style="font-size:11px; color:#aaa;">Pasif: +${sayiKurut(a.pasif)}/sn</span></div>
+                        <button onclick="arsaAl(${a.fiyat}, ${a.pasif})">Al (${sayiKurut(a.pasif)})</button>
+                    </div>
+                `;
+            });
+        }
+
+        function gorgozSekme(tur) {
+            if(tur === 'market') {
+                document.getElementById("sekmeMarket").classList.remove("hidden");
+                document.getElementById("sekmeHarita").classList.add("hidden");
+            } else {
+                document.getElementById("sekmeMarket").classList.add("hidden");
+                document.getElementById("sekmeHarita").classList.remove("hidden");
+                haritayiGuncelle();
+            }
+        }
+
+        async function haritayiGuncelle() {
+            let res = await fetch(`${firebaseURL}/HaritaSehirler.json`);
+            let data = await res.json() || {};
+            let grid = document.getElementById("gridSehirler");
+            grid.innerHTML = "";
+
+            let sahipOldugumSehirler = 0;
+
+            for(let i=0; i<40; i++) {
+                let sehirAdi = sehirIsimleri[i];
+                let sehir = data[i] || { Sahip: "Sahipsiz", Durum: "Normal" };
+                
+                if(sehir.Sahip === aktifKullanici) sahipOldugumSehirler++;
+
+                let arkaPlan = "#000";
+                let yaziRenk = "#aaa";
+                let metin = `${sehirAdi}<br><b>${sehir.Sahip}</b>`;
+
+                if(sehir.Durum === "Savaşta") {
+                    arkaPlan = "#330000";
+                    yaziRenk = "#ff6666";
+                    metin = `${sehirAdi}<br><b>SAVAŞTA!</b>`;
+                } else if(sehir.Durum === "Savunmada") {
+                    arkaPlan = "#332200";
+                    yaziRenk = "#ff9900";
+                    metin = `${sehirAdi}<br><b>SAVUNMA!</b>`;
+                } else if(sehir.Sahip !== "Sahipsiz") {
+                    arkaPlan = sehir.Sahip === aktifKullanici ? "#002200" : "#111122";
+                    yaziRenk = sehir.Sahip === aktifKullanici ? "#7cfc00" : "#8888ff";
+                }
+
+                grid.innerHTML += `
+                    <div onclick="sehirTikla(${i})" style="background: ${arkaPlan}; border: 1px solid #444; padding: 10px; text-align: center; cursor: pointer; font-size: 11px; color: ${yaziRenk}; display: flex; flex-direction: column; justify-content: center; min-height: 55px;">
+                        ${metin}
+                    </div>
+                `;
+            }
+
+            document.getElementById("lblSehirSayisi").innerText = sahipOldugumSehirler;
+            let tikBasi = Math.max(1, sahipOldugumSehirler);
+            document.getElementById("lblTikParaDegeri").innerText = `(+${sayiKurut(tikBasi)} Para)`;
+        }
+
+        async function sehirTikla(sehirIndex) {
+            let res = await fetch(`${firebaseURL}/HaritaSehirler/${sehirIndex}.json`);
+            let sehir = await res.json() || { Sahip: "Sahipsiz", Durum: "Normal" };
+
+            if(sehir.Durum === "Savaşta" || sehir.Durum === "Savunmada") {
+                alert("Bu şehir şu anda savaşta veya savunma aşamasında!");
+                return;
+            }
+
+            if(sehir.Sahip === "Sahipsiz") {
+                await fetch(`${firebaseURL}/HaritaSehirler/${sehirIndex}.json`, {
+                    method: 'PUT',
+                    body: JSON.stringify({ Sahip: aktifKullanici, Durum: "Normal" })
+                });
+                alert(`Tebrikler! ${sehirIsimleri[sehirIndex]} şehri artık senin.`);
+                haritayiGuncelle();
+            } else if(sehir.Sahip === aktifKullanici) {
+                alert("Bu şehir zaten sana ait!");
+            } else {
+                savasBaslat(sehirIndex, sehir.Sahip);
+            }
+        }
+
+        let aktifSavasSehirIndex = null;
+        let savasHasarim = 0;
+        let savasTimer = null;
+
+        async function savasBaslat(sehirIndex, sahibi) {
+            aktifSavasSehirIndex = sehirIndex;
+            savasHasarim = 0;
+            document.getElementById("savasBilgi").innerText = `${sehirIsimleri[sehirIndex]} (Sahibi: ${sahibi})`;
+            document.getElementById("savasHasarim").innerText = "0";
+            document.getElementById("modalSavas").classList.remove("hidden");
+
+            await fetch(`${firebaseURL}/HaritaSehirler/${sehirIndex}.json`, {
+                method: 'PUT',
+                body: JSON.stringify({ Sahip: sahibi, Durum: "Savaşta" })
+            });
+
+            let sure = 10;
+            document.getElementById("savasSure").innerText = `Süre: ${sure} sn`;
+
+            savasTimer = setInterval(() => {
+                sure--;
+                document.getElementById("savasSure").innerText = `Süre: ${sure} sn`;
+                if(sure <= 0) {
+                    clearInterval(savasTimer);
+                    savasBitir(sehirIndex, sahibi);
+                }
+            }, 1000);
+        }
+
+        function savastaTikla() {
+            savasHasarim += vurusGucu;
+            document.getElementById("savasHasarim").innerText = sayiKurut(savasHasarim);
+        }
+
+        async function savasBitir(sehirIndex, eskiSahip) {
+            document.getElementById("modalSavas").classList.add("hidden");
+
+            let rakipHasar = Math.floor(Math.random() * (vurusGucu * 10)) + 10;
+            let savasKazandi = savasHasarim >= rakipHasar;
+
+            if (savasKazandi) {
+                let bitisZamani = Date.now() + 600000;
+                await fetch(`${firebaseURL}/HaritaSehirler/${sehirIndex}.json`, {
+                    method: 'PUT',
+                    body: JSON.stringify({ 
+                        Sahip: aktifKullanici, 
+                        Durum: "Savunmada", 
+                        Saldirgan: eskiSahip, 
+                        RakipHasar: rakipHasar, 
+                        BitisZamani: bitisZamani 
+                    })
+                });
+                alert(`Savaşı Kazandın! ${sehirIsimleri[sehirIndex]} artık senin! Ancak eski sahibi 10 dakika içinde buraya karşı saldırı yapabilir.`);
+            } else {
+                await fetch(`${firebaseURL}/HaritaSehirler/${sehirIndex}.json`, {
+                    method: 'PUT',
+                    body: JSON.stringify({ Sahip: eskiSahip, Durum: "Normal" })
+                });
+                alert(`Savaşı Kaybettin! Sahibi şehrini savundu. (Sen: ${sayiKurut(savasHasarim)} / Rakip: ${sayiKurut(rakipHasar)})`);
+            }
+            haritayiGuncelle();
+        }
+
+        let aktifKarsiSavasIndex = null;
+        let karsiHasarim = 0;
+        let karsiTimer = null;
+        let karsiRakipHasar = 0;
+
+        async function karsiSaldiriKontrolEt() {
+            if (!aktifKullanici) return;
+            let res = await fetch(`${firebaseURL}/HaritaSehirler.json`);
+            let data = await res.json() || {};
+
+            for (let i = 0; i < 40; i++) {
+                let sehir = data[i];
+                if (sehir && sehir.Durum === "Savunmada" && sehir.Saldirgan === aktifKullanici) {
+                    if (document.getElementById("modalKarsiSavas").classList.contains("hidden")) {
+                        karsiSavasBaslat(i, sehir.RakipHasar, sehir.BitisZamani, sehir.Sahip);
+                    }
+                    break;
+                }
+            }
+        }
+
+        function karsiSavasBaslat(sehirIndex, rakipHasar, bitisZamani, mevcutSahip) {
+            aktifKarsiSavasIndex = sehirIndex;
+            karsiHasarim = 0;
+            karsiRakipHasar = rakipHasar;
+            document.getElementById("karsiSavasHasarim").innerText = "0";
+            document.getElementById("karsiSavasBilgi").innerText = `${sehirIsimleri[sehirIndex]} şehrini geri almak için tek atışlık karşı saldırı hakkın var! Şehir Sahibi: ${mevcutSahip}`;
+            document.getElementById("modalKarsiSavas").classList.remove("hidden");
+            document.getElementById("btnKarsiSaldir").disabled = false;
+
+            if (karsiTimer) clearInterval(karsiTimer);
+
+            karsiTimer = setInterval(() => {
+                let kalanMs = bitisZamani - Date.now();
+                if (kalanMs <= 0) {
+                    clearInterval(karsiTimer);
+                    document.getElementById("modalKarsiSavas").classList.add("hidden");
+                    alert("Süre bitti! Karşı saldırı hakkı sona erdi.");
+                    karsiSavasZamanAsimi(sehirIndex, mevcutSahip);
+                } else {
+                    let dk = Math.floor(kalanMs / 60000);
+                    let sn = Math.floor((kalanMs % 60000) / 1000);
+                    document.getElementById("karsiSavasSure").innerText = `Kalan Süre: ${dk}:${sn < 10 ? '0' : ''}${sn}`;
+                }
+            }, 1000);
+        }
+
+        async function karsiSaldirVur() {
+            karsiHasarim += vurusGucu;
+            document.getElementById("karsiSavasHasarim").innerText = sayiKurut(karsiHasarim);
+            document.getElementById("btnKarsiSaldir").disabled = true;
+
+            clearInterval(karsiTimer);
+            document.getElementById("modalKarsiSavas").classList.add("hidden");
+
+            let kazandi = karsiHasarim >= karsiRakipHasar;
+            let yeniSahip = kazandi ? aktifKullanici : (await eskiSahibiGetir(aktifKarsiSavasIndex));
+
+            await fetch(`${firebaseURL}/HaritaSehirler/${aktifKarsiSavasIndex}.json`, {
+                method: 'PUT',
+                body: JSON.stringify({ Sahip: yeniSahip, Durum: "Normal" })
+            });
+
+            if (kazandi) {
+                alert(`Karşı Saldırı Başarılı! Şehri geri aldın! (Sen: ${sayiKurut(karsiHasarim)} / Gerekli: ${sayiKurut(karsiRakipHasar)})`);
+            } else {
+                alert(`Karşı Saldırı Başarısız! Yeterli hasarı veremedin. Şehir onda kaldı. (Sen: ${sayiKurut(karsiHasarim)} / Gerekli: ${sayiKurut(karsiRakipHasar)})`);
+            }
+            haritayiGuncelle();
+        }
+
+        async function karsiSavasZamanAsimi(sehirIndex, mevcutSahip) {
+            await fetch(`${firebaseURL}/HaritaSehirler/${sehirIndex}.json`, {
+                method: 'PUT',
+                body: JSON.stringify({ Sahip: mevcutSahip, Durum: "Normal" })
+            });
+            haritayiGuncelle();
+        }
+
+        async function eskiSahibiGetir(sehirIndex) {
+            let res = await fetch(`${firebaseURL}/HaritaSehirler/${sehirIndex}.json`);
+            let s = await res.json();
+            return s ? s.Sahip : aktifKullanici;
+        }
+
+        let para = 0;
+        let vurusGucu = 1;
+        let pasifGelir = 0;
+
+        async function arsaVeriYukle() {
+            let res = await fetch(`${firebaseURL}/ArsaOyunu/${aktifKullanici}.json`);
+            let data = await res.json();
+            if (data) {
+                para = data.Para || 0;
+                vurusGucu = data.VurusGucu || 1;
+                pasifGelir = data.PasifGelir || 0;
+            } else {
+                para = 0;
+                vurusGucu = 1;
+                pasifGelir = 0;
+            }
+            arsaGuncelle();
+        }
+
+        async function paraKazan() {
+            let res = await fetch(`${firebaseURL}/HaritaSehirler.json`);
+            let data = await res.json() || {};
+            let sahipOldugum = 0;
+            for(let i=0; i<40; i++) {
+                if(data[i] && data[i].Sahip === aktifKullanici) sahipOldugum++;
+            }
+            let tikCarpani = Math.max(1, sahipOldugum);
+            para += tikCarpani;
+            arsaGuncelle();
+            arsaKaydet();
+        }
+
+        function silahAl(fiyat, guc) {
+            if (para >= fiyat) {
+                para -= fiyat;
+                vurusGucu += guc;
+                arsaGuncelle();
+                arsaKaydet();
+                alert("Silah alındı! Vuruş gücün arttı.");
+            } else { alert("Para yetmiyor!"); }
+        }
+
+        function arsaAl(fiyat, pasif) {
+            if (para >= fiyat) {
+                para -= fiyat;
+                pasifGelir += pasif;
+                arsaGuncelle();
+                arsaKaydet();
+                alert("Arsa alındı! Pasif gelir artırıldı.");
+            } else { alert("Para yetmiyor!"); }
+        }
+
+        setInterval(() => {
+            if (document.getElementById("gameArsa") && !document.getElementById("gameArsa").classList.contains("hidden")) {
+                if (pasifGelir > 0) {
+                    para += pasifGelir;
+                    arsaGuncelle();
+                }
+            }
+        }, 1000);
+
+        setInterval(() => {
+            if (aktifKullanici && document.getElementById("gameArsa") && !document.getElementById("gameArsa").classList.contains("hidden")) {
+                arsaKaydet();
+            }
+        }, 1000);
+
+        function arsaGuncelle() {
+            document.getElementById("lblPara").innerText = sayiKurut(para);
+            document.getElementById("lblPasifGelir").innerText = sayiKurut(pasifGelir);
+            document.getElementById("lblVurusGucu").innerText = sayiKurut(vurusGucu);
+        }
+
+        async function arsaKaydet() {
+            if (!aktifKullanici) return;
+            await fetch(`${firebaseURL}/ArsaOyunu/${aktifKullanici}.json`, {
+                method: 'PUT',
+                body: JSON.stringify({
+                    OyuncuAdi: aktifKullanici,
+                    Para: para,
+                    VurusGucu: vurusGucu,
+                    PasifGelir: pasifGelir
+                })
+            });
+        }
+
+        async function arsaLiderlikAc() {
+            document.getElementById("modalZenginler").classList.remove("hidden");
+            let res = await fetch(`${firebaseURL}/ArsaOyunu.json`);
+            let data = await res.json();
+            let div = document.getElementById("lstZenginler");
+            div.innerHTML = "";
+            if (data) {
+                let dizi = Object.values(data).sort((a,b) => b.Para - a.Para);
+                let sira = 1;
+                dizi.forEach(z => {
+                    div.innerHTML += `<div class="flex justify-between" style="border-bottom: 1px solid #333; padding: 5px 0; font-size: 13px;"><span>${sira}. ${z.OyuncuAdi}</span><span>${sayiKurut(z.Para)} para</span></div>`;
+                    sira++;
+                });
+            } else {
+                div.innerHTML = "<div style='color: #888;'>Henüz kayıt yok</div>";
+            }
+        }
+
+        async function solPanoyuGuncelle() {
+            try {
+                let resKull = await fetch(`${firebaseURL}/Kullanicilar.json`);
+                let dataKull = await resKull.json();
+                let resAyak = await fetch(`${firebaseURL}/AyakNumaralari.json`);
+                let dataAyak = await resAyak.json();
+
+                let panoDiv = document.getElementById("solPanoListesi");
+                panoDiv.innerHTML = "";
+
+                if (dataKull) {
+                    for (let key in dataKull) {
+                        let mAdi = dataKull[key].KullaniciAdi;
+                        let ayak = dataAyak && dataAyak[mAdi] ? dataAyak[mAdi].AyakNo + "numara (tescilli)" : "ayak numarası tescillenmemis";
+
+                        panoDiv.innerHTML += `
+                            <div class="flex justify-between" style="border-bottom: 1px solid #333; padding: 6px 0; font-size: 13px;">
+                                <span style="color: #fff; font-weight: bold;">${mAdi}</span>
+                                <span style="color: #aaa;">${ayak}</span>
+                            </div>
+                        `;
+                    }
+                } else {
+                    panoDiv.innerHTML = "<div style='color: #777; font-size: 12px;'>Kayit yok</div>";
+                }
+            } catch(e) {}
+        }
+
+        function formuDegistir() {
+            kayitModu = !kayitModu;
+            const title = document.getElementById("formTitle");
+            const btn = document.getElementById("actionBtn");
+            const toggle = document.getElementById("toggleBtn");
+
+            if (kayitModu) {
+                title.innerText = "Kayit Ol";
+                btn.innerText = "Kayit Ol";
+                btn.setAttribute("onclick", "kayitOl()");
+                toggle.innerText = "Zaten hesabin var mi? Giris yap";
+            } else {
+                title.innerText = "Giris Yap";
+                btn.innerText = "Giris Yap";
+                btn.setAttribute("onclick", "girisYap()");
+                toggle.innerText = "Hesabin yok mu? Kayit ol";
+            }
+        }
+
+        async function girisYap() {
+            let kadi = document.getElementById("txtKadi").value.trim();
+            let sifre = document.getElementById("txtSifre").value.trim();
+            if (!kadi || !sifre) { alert("Bos birakma"); return; }
+
+            let res = await fetch(`${firebaseURL}/Kullanicilar.json`);
+            let data = await res.json();
+            let ok = false;
+            let gercekAd = "";
+            if (data) {
+                for (let k in data) {
+                    if (data[k].KullaniciAdi.toLowerCase() === kadi.toLowerCase() && data[k].Sifre === sifre) {
+                        ok = true;
+                        gercekAd = data[k].KullaniciAdi;
+                        break;
+                    }
+                }
+            }
+            if (ok) {
+                aktifKullanici = gercekAd;
+                document.getElementById("loginScreen").classList.add("hidden");
+                document.getElementById("topBar").classList.remove("hidden");
+                document.getElementById("chatInputBolumu").classList.remove("hidden");
+                document.getElementById("userDisplay").innerText = aktifKullanici;
+                anaMenuDon();
+                chatLoglariGetir();
+            } else {
+                alert("Hatali giris");
+            }
+        }
+
+        async function kayitOl() {
+            let kadi = document.getElementById("txtKadi").value.trim();
+            let sifre = document.getElementById("txtSifre").value.trim();
+            if (!kadi || !sifre) { alert("Bos birakma"); return; }
+
+            let res = await fetch(`${firebaseURL}/Kullanicilar.json`);
+            let data = await res.json();
+            if (data) {
+                for (let k in data) {
+                    if (data[k].KullaniciAdi.toLowerCase() === kadi.toLowerCase()) {
+                        alert("Bu isim alinmis");
+                        return;
+                    }
+                }
+            }
+
+            await fetch(`${firebaseURL}/Kullanicilar.json`, { method: 'POST', body: JSON.stringify({ KullaniciAdi: kadi, Sifre: sifre }) });
+            alert("Kayit basarili");
+            formuDegistir();
+            solPanoyuGuncelle();
+        }
+
+        function cikisYap() { location.reload(); }
+
+        function anaMenuDon() {
+            document.getElementById("mainMenu").classList.remove("hidden");
+            document.getElementById("gameCps").classList.add("hidden");
+            document.getElementById("gameArsa").classList.add("hidden");
+            document.getElementById("gameAyak").classList.add("hidden");
+            document.getElementById("gameFeedback").classList.add("hidden");
+            document.getElementById("gameXox").classList.add("hidden");
+            durumSifirlaCps();
+            if(aktifXoxOdaId) xoxLobiyeDon();
+        }
+
+        function oyunSec(tur) {
+            document.getElementById("mainMenu").classList.add("hidden");
+            if (tur === 'cps') {
+                document.getElementById("gameCps").classList.remove("hidden");
+                cpsSkorlariGetir();
+            } else if (tur === 'arsa') {
+                document.getElementById("gameArsa").classList.remove("hidden");
+                gorgozSekme('market');
+                arsaVeriYukle();
+            } else if (tur === 'ayak') {
+                document.getElementById("gameAyak").classList.remove("hidden");
+                ayakKontrolEt();
+            } else if (tur === 'feedback') {
+                document.getElementById("gameFeedback").classList.remove("hidden");
+                feedbackleriGetir();
+            } else if (tur === 'xox') {
+                document.getElementById("gameXox").classList.remove("hidden");
+                xoxLobiyeDon();
+            }
+        }
+
+        let tikCps = 0, sureCps = 5, basladiCps = false, tCps = null;
+        function durumSifirlaCps() {
+            clearInterval(tCps);
+            basladiCps = false;
+            tikCps = 0; sureCps = 5;
+            document.getElementById("lblSure").innerText = "5 sn";
+            document.getElementById("lblTiklama").innerText = "Tik: 0";
+            document.getElementById("btnTiklaCps").innerText = "TIKLA (5 sn)";
+        }
+        function cpsTikla() {
+            if (!basladiCps) {
+                basladiCps = true; tikCps = 0; sureCps = 5;
+                let b = document.getElementById("btnTiklaCps");
+                b.innerText = "BASLIYOR";
+                tCps = setInterval(() => {
+                    sureCps--;
+                    document.getElementById("lblSure").innerText = sureCps + " sn";
+                    if (sureCps <= 0) {
+                        clearInterval(tCps); basladiCps = false;
+                        alert(`Sure bitti. Toplam tik: ${tikCps}`);
+                        b.innerText = "TEKRAR";
+                        cpsSkorKaydet(aktifKullanici, tikCps);
+                    }
+                }, 1000);
+            }
+            if (basladiCps) {
+                tikCps++;
+                document.getElementById("lblTiklama").innerText = "Tik: " + tikCps;
+            }
+        }
+        async function cpsSkorKaydet(oyuncu, skor) {
+            await fetch(`${firebaseURL}/Skorlar.json`, { method: 'POST', body: JSON.stringify({ OyuncuAdi: oyuncu, Skor: skor }) });
+            cpsSkorlariGetir();
+        }
+        async function cpsSkorlariGetir() {
+            let res = await fetch(`${firebaseURL}/Skorlar.json`);
+            let data = await res.json();
+            let div = document.getElementById("lstCpsSkorlar");
+            div.innerHTML = "";
+            if (data) {
+                let dizi = Object.values(data).sort((a,b) => b.Skor - a.Skor);
+                let sira = 1;
+                dizi.slice(0,10).forEach(s => {
+                    div.innerHTML += `<div class="flex justify-between" style="border-bottom: 1px solid #333; padding: 4px 0; font-size: 12px;"><span>${sira}. ${s.OyuncuAdi}</span><span>${s.Skor} tik</span></div>`;
+                    sira++;
+                });
+            }
+        }
+
+        async function ayakKontrolEt() {
+            let res = await fetch(`${firebaseURL}/AyakNumaralari/${aktifKullanici}.json`);
+            let data = await res.json();
+            let inp = document.getElementById("ayakInputBolumu");
+            let msg = document.getElementById("ayakKilitMesaji");
+            if (data) { inp.classList.add("hidden"); msg.classList.remove("hidden"); }
+            else { inp.classList.remove("hidden"); msg.classList.add("hidden"); document.getElementById("txtAyakNo").value = ""; }
+        }
+        async function ayakNumarasiKaydet() {
+            let no = document.getElementById("txtAyakNo").value.trim();
+            if (!no) { alert("Numara gir"); return; }
+            await fetch(`${firebaseURL}/AyakNumaralari/${aktifKullanici}.json`, { method: 'PUT', body: JSON.stringify({ AyakNo: no }) });
+            alert("Kaydedildi");
+            solPanoyuGuncelle();
+            ayakKontrolEt();
+        }
+
+        async function feedbackGonder() {
+            let ad = document.getElementById("fbAd").value.trim();
+            let soyad = document.getElementById("fbSoyad").value.trim();
+            let kadi = document.getElementById("fbKadi").value.trim();
+            let gmail = document.getElementById("fbGmail").value.trim();
+            let mesaj = document.getElementById("fbMesaj").value.trim();
+
+            if (!ad || !soyad || !kadi || !gmail || !mesaj) {
+                alert("Lütfen tüm alanları doldur.");
+                return;
+            }
+
+            let yeniFeedback = { Ad: ad, Soyad: soyad, KullaniciAdi: kadi, Gmail: gmail, Mesaj: mesaj };
+            await fetch(`${firebaseURL}/Feedbackler.json`, {
+                method: 'POST',
+                body: JSON.stringify(yeniFeedback)
+            });
+
+            alert("Feedback gönderildi.");
+            document.getElementById("fbAd").value = "";
+            document.getElementById("fbSoyad").value = "";
+            document.getElementById("fbKadi").value = "";
+            document.getElementById("fbGmail").value = "";
+            document.getElementById("fbMesaj").value = "";
+            feedbackleriGetir();
+        }
+
+        async function feedbackleriGetir() {
+            let res = await fetch(`${firebaseURL}/Feedbackler.json`);
+            let data = await res.json();
+            let div = document.getElementById("lstFeedback");
+            div.innerHTML = "";
+            if (data) {
+                let dizi = Object.values(data).reverse();
+                dizi.forEach(f => {
+                    div.innerHTML += `
+                        <div style="border-bottom: 1px solid #333; padding: 6px 0; font-size: 12px;">
+                            <div><b>${f.Ad} ${f.Soyad}</b> (${f.KullaniciAdi})</div>
+                            <div style="color: #aaa;">${f.Mesaj}</div>
+                        </div>
+                    `;
+                });
+            } else {
+                div.innerHTML = "<div style='color: #888;'>Henüz feedback yok</div>";
+            }
+        }
+
+        function sayfayiGuncelle() {
+            if (typeof solPanoyuGuncelle === 'function') solPanoyuGuncelle();
+            if (typeof haritayiGuncelle === 'function') haritayiGuncelle();
+            if (typeof xoxOdalariniGetir === 'function') xoxOdalariniGetir();
+            if (typeof chatLoglariGetir === 'function') chatLoglariGetir();
+            console.log("Veriler güncellendi!");
+        }
+    </script>
+</body>
+</html>
