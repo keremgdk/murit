@@ -106,7 +106,8 @@
             
             <div class="flex justify-between" style="background: #000; border: 1px solid #444; padding: 12px; margin-bottom: 10px; font-size: 13px;">
                 <div>Para: <span id="lblPara" style="font-weight: bold; color: #fff;">0</span></div>
-                <div>Tık Başı Değer: <span id="lblVurusGucu" style="font-weight: bold; color: #fff;">1</span></div>
+                <div>Pasif Gelir: <span id="lblPasifGelir" style="font-weight: bold; color: #fff;">0</span>/sn</div>
+                <div>Tık Değeri: <span id="lblVurusGucu" style="font-weight: bold; color: #fff;">1</span></div>
                 <div>Şehir Sayısı: <span id="lblSehirSayisi" style="font-weight: bold; color: #fff;">0</span></div>
             </div>
 
@@ -117,14 +118,22 @@
                 <button onclick="arsaLiderlikAc()" style="flex: 1;">Zenginler Listesi</button>
             </div>
 
+         
+
             <!-- 1. Market Sekmesi -->
             <div id="sekmeMarket">
                 <button onclick="paraKazan()" style="width: 100%; padding: 15px; font-size: 15px; font-weight: bold; margin-bottom: 15px; background: #002244;">
                     PARA KAZAN (TIKLA) <span id="lblTikParaDegeri" style="color: #7cfc00;">(+1 Para)</span>
                 </button>
-                <div style="text-align: left;">
-                    <div style="font-size: 12px; color: #888; margin-bottom: 5px;">Mevcut Eşyalar ve Silahlar (Sıralı Satın Alım - Geri Dönüş Yok)</div>
-                    <div id="silahlarListesi" class="scroll" style="height: 250px;"></div>
+                <div class="grid-2" style="text-align: left;">
+                    <div>
+                        <div style="font-size: 12px; color: #888; margin-bottom: 5px;">Silahlar (Tık Değerini Artırır - Sıralı)</div>
+                        <div id="silahlarListesi" class="scroll" style="height: 220px;"></div>
+                    </div>
+                    <div>
+                        <div style="font-size: 12px; color: #888; margin-bottom: 5px;">Eşyalar (Saniyede Pasif Gelir Sağlar - Sıralı)</div>
+                        <div id="esyalarListesi" class="scroll" style="height: 220px;"></div>
+                    </div>
                 </div>
             </div>
 
@@ -147,7 +156,7 @@
                         <div id="mutlulukBinalariListesi" class="scroll" style="height: 180px;"></div>
                     </div>
                     <div>
-                        <div style="font-size: 12px; font-weight: bold; margin-bottom: 5px; color: #7cfc00;">Para Üretim Yapıları (Pasif Tık Kazancı)</div>
+                        <div style="font-size: 12px; font-weight: bold; margin-bottom: 5px; color: #7cfc00;">Para Üretim Yapıları (Pasif Gelir Artırır)</div>
                         <div id="paraBinalariListesi" class="scroll" style="height: 180px;"></div>
                     </div>
                 </div>
@@ -167,14 +176,26 @@
             </div>
         </div>
 
-        <!-- 1 DAKİKALIK TEK ATIŞLIK KARŞI SALDIRI / SAVUNMA MODAL -->
+        <!-- KUŞATMA / SAVUNMA (1 DAKİKA İÇİNDE GERİ ÇEVİRME) MODAL -->
         <div id="modalKarsiSavas" class="hidden" style="position: fixed; inset: 0; background: rgba(0,0,0,0.9); display: flex; align-items: center; justify-content: center; z-index: 99;">
             <div class="box" style="text-align: center;">
-                <div style="font-weight: bold; font-size: 18px; margin-bottom: 10px; color: #ff9900;">ŞEHİR KARŞI SALDIRISI (SAVUNMA)!</div>
-                <div id="karsiSavasBilgi" style="font-size: 13px; color: #aaa; margin-bottom: 15px;">Şehir saldırıya uğradı! 1 dakikan var, tek atış hakkını iyi kullan.</div>
+                <div style="font-weight: bold; font-size: 18px; margin-bottom: 10px; color: #ff9900;">ŞEHİR KUŞATMA ALTINDA!</div>
+                <div id="karsiSavasBilgi" style="font-size: 13px; color: #aaa; margin-bottom: 15px;">Şehrine saldırıldı! 1 dakika içinde kuştamayı geri çevirmezsen şehir tamamen gidecek.</div>
                 <div id="karsiSavasSure" style="font-size: 22px; font-weight: bold; margin-bottom: 15px; color: #fff;">Kalan Süre: 1:00</div>
-                <div style="font-size: 13px; margin-bottom: 15px;">Tek Atışlık Hasarın: <span id="karsiSavasHasarim" style="font-weight: bold; color: #fff;">0</span></div>
-                <button id="btnKarsiSaldir" onclick="karsiSaldirVur()" style="width: 100%; padding: 25px; font-size: 18px; background: #003366; font-weight: bold;">TEK ATIŞ YAP (SALDIR)!</button>
+                <div id="savunmaIslemBolumu" class="space-y">
+                    <button onclick="kusuamayiGeriCevirBaslat()" style="width: 100%; padding: 18px; background: #003366; font-weight: bold;">KUŞATMAYI GERİ ÇEVİR (10 Sn Savaş Başlat)</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- SAVUNMA 10 SANİYE TIKLAMA SAVAŞI MODAL -->
+        <div id="modalSavunmaSavas" class="hidden" style="position: fixed; inset: 0; background: rgba(0,0,0,0.9); display: flex; align-items: center; justify-content: center; z-index: 99;">
+            <div class="box" style="text-align: center;">
+                <div style="font-weight: bold; font-size: 18px; margin-bottom: 10px; color: #ff6666;">SAVUNMA SAVAŞI (10 SANİYE)!</div>
+                <div id="savunmaSavasBilgi" style="font-size: 13px; color: #aaa; margin-bottom: 15px;">Şehrini korumak için çılgınlar gibi tıkla!</div>
+                <div id="savunmaSavasSure" style="font-size: 22px; font-weight: bold; margin-bottom: 15px; color: #fff;">Süre: 10 sn</div>
+                <div style="font-size: 13px; margin-bottom: 15px;">Senin Toplam Hasarın: <span id="savunmaHasarim" style="font-weight: bold; color: #fff;">0</span></div>
+                <button onclick="savunmaSavasindaTikla()" style="width: 100%; padding: 25px; font-size: 18px; background: #004400; font-weight: bold;">SAVUN! (Tıkla)</button>
             </div>
         </div>
 
@@ -259,7 +280,7 @@
             setInterval(haritayiGuncelle, 2000);
             setInterval(karsiSaldiriKontrolEt, 3000);
             setInterval(chatLoglariGetir, 2500);
-            setInterval(sehirMemnuniyetKontrolEt, 10000); // Halk isyan kontrolü
+            setInterval(pasifGelirIsle, 1000); // Saniyelik pasif gelir
         };
 
         function sayiKurut(sayi) {
@@ -272,6 +293,17 @@
 
             let bolum = sayi / Math.pow(10, basamak * 3);
             return bolum.toFixed(2) + " " + birimler[basamak];
+        }
+
+        // --- HERKESİ SIFIRLAMA GEÇİCİ SİSTEMİ ---
+        async function herkesiSifirlaSistemi() {
+            if(!confirm("DİKKAT: Görgözdeki tüm oyuncuların paralarını, silahlarını, eşyalarını ve şehirlerini sıfırlamak istediğine emin misin?")) return;
+            
+            await fetch(`${firebaseURL}/ArsaOyunu.json`, { method: 'DELETE' });
+            await fetch(`${firebaseURL}/HaritaSehirler.json`, { method: 'DELETE' });
+            
+            alert("Tüm görgöz verileri sıfırlandı!");
+            location.reload();
         }
 
         // --- CHAT LOG SİSTEMİ ---
@@ -416,7 +448,7 @@
             xoxVerileriSenkronizeEt();
         }
 
-        // --- GÖRGÖZ OYUNU VE 100 SEVİYE SİLAH/EŞYA SİSTEMİ ---
+        // --- GÖRGÖZ OYUNU SİSTEMİ ---
         const sehirIsimleri = [
             "İstanbul", "Ankara", "İzmir", "Bursa", "Antalya", "Adana", "Konya", "Gaziantep", "Şanlıurfa", "Mersin",
             "Kocaeli", "Diyarbakır", "Hatay", "Manisa", "Kayseri", "Samsun", "Balıkesir", "Kahramanmaraş", "Van", "Aydın",
@@ -424,7 +456,7 @@
             "Afyonkarahisar", "Sivas", "Adıyaman", "Tokat", "Zonguldak", "Çanakkale", "Şırnak", "Elazığ", "Kütahya", "Osmaniye"
         ];
 
-        const esyaIsimleri = [
+        const silahIsimleri = [
             "Paslu Kanca", "Tahta Sopa", "Demir Çubuk", "Kırık Bıçak", "Avcı Hançeri", "Kısa Kama", "Bakır Kılıç", "Tunç Kılıç", "Keskin Pala", "Çelik Kılıç",
             "Usta Kılıcı", "Gladyatör Kılıcı", "Savaş Baltası", "İki Ağızlı Balta", "Karakoncoloz", "Zehirli Hançer", "Ejder Dişi", "Kalkan Kıran", "Ateş Palası", "Buz Kılıcı",
             "Yıldırım Kılıcı", "Gölge Bıçağı", "Kanlı Kama", "Karanlık Mızrak", "Şövalye Kılıcı", "Kraliyet Kılıcı", "Titan Kesici", "Kıyamet Baltası", "Ruh Emici", "Kadim Kılıç",
@@ -437,13 +469,35 @@
             "Dağ Yıkan", "Deprem Kılıcı", "Volkanik Kama", "Lav Püskürten", "Buzul Kesen", "Rüzgar Kanadı", "Kasırga Bıçağı", "Yıldırım Hızı", "Gök Gürültüsü", "Kıyamet Silahı"
         ];
 
+        const esyaIsimleri = [
+            "Küçük Çuval", "Bakır Sikke", "Gümüş Kese", "Altın Sandık", "Değerli Mücevher", "Elmas Yüzük", "Antik Vazo", "Tarihi Eser", "Kraliyet Tacı", "Altın Taht",
+            "Küçük Tarla", "Mısır Tarlası", "Buğday Evi", "Kerpiç Ev", "Taş Villa", "Bahçeli Konak", "Lüks Malikane", "Çiftlik Evi", "Bağ Evi", "Küçük Dükkan",
+            "Mahalle Bakkalı", "Manav Dükkanı", "Kasap Dükkanı", "Berber Dükkanı", "Tamirhane", "Depo", "Atölye", "Küçük Fabrika", "Tekstil Atölyesi", "Oto Tamir",
+            "Benzinlik", "Otopark", "Kafeterya", "Çay Ocağı", "Lokanta", "Büfe", "Market Zinciri", "Süpermarket", "AVM Arazisi", "Otel İnşaatı",
+            "Tatil Köyü", "Butik Otel", "Plaj Tesisleri", "Yat Limanı", "Marina", "Liman Arazisi", "Gümrük Binası", "Antrepo", "Lojistik Üssü", "Sanayi Sitesi",
+            "Ağır Sanayi", "Çelik Fabrikası", "Otomobil Fabrikası", "Teknoloji Üssü", "Bilim Merkezi", "Laboratuvar", "Ar-Ge Binası", "Üniversite Kampüsü", "Okul Arazisi", "Hastane Arazisi",
+            "Sağlık Ocağı", "Eczane Zinciri", "Belediye Binası", "Mahkeme Sarayı", "Banka Binası", "Borsa Merkezi", "Finans Kulesi", "Gökdelen Arazisi", "Plaza", "İş Merkezi",
+            "Holding Binası", "Medya Merkezi", "Televizyon Kulesi", "Stüdyo", "Sinema Salonu", "Tiyatro Sahnesi", "Spor Kompleksi", "Futbol Stadyumu", "Basketbol Salonu", "Yüzme Havuzu",
+            "Tenis Kortu", "Golf Sahası", "Yarış Pisti", "Havaalanı", "Helikopter Pisti", "Uzay Üssü", "Uydu İstasyonu", "Radar Üssü", "Askeri Üs", "Kışla",
+            "Silah Deposu", "Nükleer Tesis", "Enerji Santrali", "Baraj Arazisi", "Rüzgar Çiftliği", "Güneş Enerji Tarlası", "Su Kuyusu", "Petrol Kuyusu", "Altın Madeni", "Evrenin Merkezi"
+        ];
+
         const silahVerileri = [];
         let bazFiyatSilah = 20;
         let bazDegerSilah = 1;
         for(let i=0; i<100; i++) {
-            silahVerileri.push({ id: i+1, ad: `${esyaIsimleri[i]} (Seviye ${i+1})`, fiyat: bazFiyatSilah, deger: bazDegerSilah });
+            silahVerileri.push({ id: i+1, ad: `${silahIsimleri[i]} (Seviye ${i+1})`, fiyat: bazFiyatSilah, deger: bazDegerSilah });
             bazFiyatSilah = Math.floor(bazFiyatSilah * 2.15);
             bazDegerSilah += Math.floor(bazDegerSilah * 1.35) + 3;
+        }
+
+        const esyaVerileri = [];
+        let bazFiyatEsya = 30;
+        let bazPasifEsya = 1;
+        for(let i=0; i<100; i++) {
+            esyaVerileri.push({ id: i+1, ad: `${esyaIsimleri[i]} (Seviye ${i+1})`, fiyat: bazFiyatEsya, pasif: bazPasifEsya });
+            bazFiyatEsya = Math.floor(bazFiyatEsya * 2.2);
+            bazPasifEsya += Math.floor(bazPasifEsya * 1.4) + 5;
         }
 
         // 5 Mutluluk Yapısı
@@ -451,61 +505,103 @@
             { id: 'park', ad: 'Şehir Parkı', maliyet: 500, etki: 10 },
             { id: 'okul', ad: 'İlköğretim Okulu', maliyet: 2000, etki: 20 },
             { id: 'hastane', ad: 'Devlet Hastanesi', maliyet: 8000, etki: 35 },
-            { id: 'tiyatro', ad: 'Kültür ve Tiyatro Merkezi', maliyet: 25000, etki: 50 },
+            { id: 'tiyatro', ad: 'Kültür Merkezi', maliyet: 25000, etki: 50 },
             { id: 'saray', ad: 'Belediye Sarayı', maliyet: 100000, etki: 80 }
         ];
 
-        // 5 Para Üretim Yapısı (Tık bası gelirinin 2 katı saniyede kazandırır)
+        // 5 Para Üretim Yapısı
         const paraYapilari = [
-            { id: 'bakkal', ad: 'Mahalle Bakkalı', maliyet: 300, carpantid: 1 },
-            { id: 'manav', ad: 'Semt Pazarı', maliyet: 1200, carpantid: 2 },
-            { id: 'avm', ad: 'Mini AVM', maliyet: 5000, carpantid: 4 },
-            { id: 'fabrika', ad: 'Tekstil Fabrikası', maliyet: 20000, carpantid: 8 },
-            { id: 'borsa', ad: 'Finans Merkezi', maliyet: 80000, carpantid: 15 }
+            { id: 'bakkal', ad: 'Mahalle Bakkalı', maliyet: 300, pasifKatki: 5 },
+            { id: 'manav', ad: 'Semt Pazarı', maliyet: 1200, pasifKatki: 20 },
+            { id: 'avm', ad: 'Mini AVM', maliyet: 5000, pasifKatki: 80 },
+            { id: 'fabrika', ad: 'Tekstil Fabrikası', maliyet: 20000, pasifKatki: 300 },
+            { id: 'borsa', ad: 'Finans Merkezi', maliyet: 80000, pasifKatki: 1200 }
         ];
 
         let para = 0;
-        let mevcutSilahSeviyesi = 1; // 1'den başlar, aşağı inilemez, aynı eşyadan tekrar alınamaz
+        let mevcutSilahSeviyesi = 1; 
+        let mevcutEsyaSeviyesi = 0; // 0 hiç alınmamış demektir
 
         function marketleriOlustur() {
             let silahDiv = document.getElementById("silahlarListesi");
+            let esyaDiv = document.getElementById("esyalarListesi");
             silahDiv.innerHTML = "";
+            esyaDiv.innerHTML = "";
 
             silahVerileri.forEach(s => {
                 let alindiMi = s.id < mevcutSilahSeviyesi;
                 let aktifSeviyeMi = s.id === mevcutSilahSeviyesi;
-                let butonMetin = alindiMi ? "Alındı (Geçildi)" : (aktifSeviyeMi ? "Kullanılıyor" : `Al (${sayiKurut(s.fiyat)})`);
+                let butonMetin = alindiMi ? "Alındı" : (aktifSeviyeMi ? "Kullanılıyor" : `Al (${sayiKurut(s.fiyat)})`);
                 let devreDisi = alindiMi || aktifSeviyeMi;
 
                 silahDiv.innerHTML += `
                     <div class="flex justify-between items-center" style="background: #111; border: 1px solid #444; padding: 8px 12px; margin-bottom: 6px;">
-                        <div><b>${s.ad}</b><br><span style="font-size:11px; color:#7cfc00;">Tık Değeri: +${sayiKurut(s.deger)} Para</span></div>
+                        <div><b>${s.ad}</b><br><span style="font-size:11px; color:#7cfc00;">Tık Değeri: +${sayiKurut(s.deger)}</span></div>
                         <button ${devreDisi ? 'disabled' : ''} onclick="silahAl(${s.id}, ${s.fiyat})">${butonMetin}</button>
+                    </div>
+                `;
+            });
+
+            esyaVerileri.forEach(e => {
+                let alindiMi = e.id < mevcutEsyaSeviyesi;
+                let aktifSeviyeMi = e.id === mevcutEsyaSeviyesi;
+                let butonMetin = alindiMi ? "Alındı" : (aktifSeviyeMi ? "Kullanılıyor" : `Al (${sayiKurut(e.fiyat)})`);
+                let devreDisi = alindiMi || aktifSeviyeMi;
+
+                esyaDiv.innerHTML += `
+                    <div class="flex justify-between items-center" style="background: #111; border: 1px solid #444; padding: 8px 12px; margin-bottom: 6px;">
+                        <div><b>${e.ad}</b><br><span style="font-size:11px; color:#ff9900;">Pasif Gelir: +${sayiKurut(e.pasif)}/sn</span></div>
+                        <button ${devreDisi ? 'disabled' : ''} onclick="esyaAl(${e.id}, ${e.fiyat})">${butonMetin}</button>
                     </div>
                 `;
             });
         }
 
         function silahAl(id, fiyat) {
-            if (id !== mevcutSilahSeviyesi + 1) {
-                alert("Sıralı gitmelisin! Sadece bir sonraki seviye eşyayı satın alabilirsin.");
-                return;
-            }
+            if (id !== mevcutSilahSeviyesi + 1) { alert("Sıralı gitmelisin!"); return; }
             if (para >= fiyat) {
                 para -= fiyat;
                 mevcutSilahSeviyesi = id;
                 marketleriOlustur();
                 arsaGuncelle();
                 arsaKaydet();
-                alert(`Tebrikler! ${esyaIsimleri[id-1]} eşyasına terfi ettin. Eski eşyalara geri dönüş yok!`);
-            } else {
-                alert("Paran yetmiyor!");
-            }
+                alert("Silah alındı!");
+            } else { alert("Paran yetmiyor!"); }
+        }
+
+        function esyaAl(id, fiyat) {
+            if (id !== mevcutEsyaSeviyesi + 1) { alert("Sıralı gitmelisin!"); return; }
+            if (para >= fiyat) {
+                para -= fiyat;
+                mevcutEsyaSeviyesi = id;
+                marketleriOlustur();
+                arsaGuncelle();
+                arsaKaydet();
+                alert("Eşya alındı, pasif gelir artırıldı!");
+            } else { alert("Paran yetmiyor!"); }
         }
 
         function getMevcutTikDegeri() {
             let silah = silahVerileri.find(s => s.id === mevcutSilahSeviyesi);
             return silah ? silah.deger : 1;
+        }
+
+        function getToplamPasifGelir() {
+            let temelPasif = 0;
+            if (mevcutEsyaSeviyesi > 0) {
+                let esya = esyaVerileri.find(e => e.id === mevcutEsyaSeviyesi);
+                if (esya) temelPasif = esya.pasif;
+            }
+            return temelPasif;
+        }
+
+        function pasifGelirIsle() {
+            if (!aktifKullanici) return;
+            let pasif = getToplamPasifGelir();
+            if (pasif > 0) {
+                para += pasif;
+                arsaGuncelle();
+            }
         }
 
         function gorgozSekme(tur) {
@@ -540,7 +636,7 @@
                 if(sehir.Durum === "Savaşta") {
                     arkaPlan = "#330000"; yaziRenk = "#ff6666"; metin = `${sehirAdi}<br><b>SAVAŞTA!</b>`;
                 } else if(sehir.Durum === "Savunmada") {
-                    arkaPlan = "#332200"; yaziRenk = "#ff9900"; metin = `${sehirAdi}<br><b>SAVUNMA!</b>`;
+                    arkaPlan = "#332200"; yaziRenk = "#ff9900"; metin = `${sehirAdi}<br><b>KUŞATMA!</b>`;
                 } else if(sehir.Sahip !== "Sahipsiz") {
                     arkaPlan = sehir.Sahip === aktifKullanici ? "#002200" : "#111122";
                     yaziRenk = sehir.Sahip === aktifKullanici ? "#7cfc00" : "#8888ff";
@@ -555,6 +651,7 @@
 
             document.getElementById("lblSehirSayisi").innerText = sahipOldugumSehirler;
             document.getElementById("lblVurusGucu").innerText = sayiKurut(getMevcutTikDegeri());
+            document.getElementById("lblPasifGelir").innerText = sayiKurut(getToplamPasifGelir());
             document.getElementById("lblTikParaDegeri").innerText = `(+${sayiKurut(getMevcutTikDegeri())} Para)`;
         }
 
@@ -563,7 +660,7 @@
             let sehir = await res.json() || { Sahip: "Sahipsiz", Durum: "Normal", Memnuniyet: 100, Binalar: [] };
 
             if(sehir.Durum === "Savaşta" || sehir.Durum === "Savunmada") {
-                alert("Bu şehir şu anda savaşta veya savunma aşamasında!");
+                alert("Bu şehir şu anda savaşta veya kuşatma altında!");
                 return;
             }
 
@@ -606,8 +703,8 @@
                 let alindi = sehir.Binalar && sehir.Binalar.includes(p.id);
                 paraDiv.innerHTML += `
                     <div class="flex justify-between items-center" style="background:#050505; border:1px solid #333; padding:6px; margin-bottom:4px; font-size:11px;">
-                        <div><b>${p.ad}</b><br><span style="color:#7cfc00;">Gelir Üretir</span></div>
-                        <button ${alindi ? 'disabled' : ''} onclick="binaInsaEt('${p.id}', ${p.maliyet})">${alindi ? 'Yapıldı' : 'Kur (' + sayiKurut(p.maliyet) + ')'}</button>
+                        <div><b>${p.ad}</b><br><span style="color:#7cfc00;">+${p.pasifKatki}/sn Pasif</span></div>
+                        <button ${alindi ? 'disabled' : ''} onclick="binaInsaEt('${p.id}', ${p.maliyet})">${alindi ? 'Kuruldu' : 'Kur (' + sayiKurut(p.maliyet) + ')'}</button>
                     </div>
                 `;
             });
@@ -626,10 +723,13 @@
             if (!sehir.Binalar) sehir.Binalar = [];
             sehir.Binalar.push(binaId);
 
-            // Memnuniyet etkisi hesapla
             let mutYap = mutlulukYapilari.find(m => m.id === binaId);
-            if (mutYap) {
-                sehir.Memnuniyet = Math.min(100, (sehir.Memnuniyet || 100) + mutYap.etki);
+            if (mutYap) sehir.Memnuniyet = Math.min(100, (sehir.Memnuniyet || 100) + mutYap.etki);
+
+            let pYap = paraYapilari.find(p => p.id === binaId);
+            if (pYap) {
+                if (!sehir.EkstraPasif) sehir.EkstraPasif = 0;
+                sehir.EkstraPasif += pYap.pasifKatki;
             }
 
             await fetch(`${firebaseURL}/HaritaSehirler/${aktifYonetimSehirIndex}.json`, {
@@ -637,40 +737,8 @@
                 body: JSON.stringify(sehir)
             });
 
-            alert("Bina başarıyla inşa edildi!");
+            alert("Bina başarıyla kuruldu!");
             sehirYonetiminiAc(aktifYonetimSehirIndex, sehir);
-        }
-
-        // Saniyede bir şehir gelirleri (1 tıklamanın 2 katı oranında bina başına)
-        setInterval(() => {
-            if (!aktifKullanici) return;
-            // Şehir binalarından gelen pasif olmayan ama aktif yapı gelirleri tetiklenebilir
-        }, 1000);
-
-        async function sehirMemnuniyetKontrolEt() {
-            let res = await fetch(`${firebaseURL}/HaritaSehirler.json`);
-            let data = await res.json() || {};
-            let degisti = false;
-
-            for(let i=0; i<40; i++) {
-                let sehir = data[i];
-                if (sehir && sehir.Sahip !== "Sahipsiz") {
-                    // Zamanla memnuniyet yavaşça düşer, önlem alınmazsa isyan eder
-                    if (sehir.Memnuniyet === undefined) sehir.Memnuniyet = 100;
-                    sehir.Memnuniyet -= 1; // Yavaşça düşüş
-                    
-                    if (sehir.Memnuniyet <= 0) {
-                        sehir.Sahip = "Sahipsiz";
-                        sehir.Memnuniyet = 100;
-                        sehir.Binalar = [];
-                        sehir.Durum = "Normal";
-                        degisti = true;
-                    }
-                }
-            }
-            if (degisti) {
-                // Veritabanına güncellenmiş hallerini yazabilmek için
-            }
         }
 
         let aktifSavasSehirIndex = null;
@@ -714,7 +782,7 @@
             let savasKazandi = savasHasarim >= rakipHasar;
 
             if (savasKazandi) {
-                let bitisZamani = Date.now() + 60000; // 1 Dakikalık Savunma / Karşı Saldırı Süresi
+                let bitisZamani = Date.now() + 60000; // 1 Dakikalık Kuşatma Savunma Süresi
                 await fetch(`${firebaseURL}/HaritaSehirler/${sehirIndex}.json`, {
                     method: 'PUT',
                     body: JSON.stringify({ 
@@ -727,21 +795,22 @@
                         Binalar: []
                     })
                 });
-                alert(`Savaşı Kazandın! Şehir senin oldu! Eski sahibinin 1 dakikalık tek atışlık karşı saldırı hakkı başladı.`);
+                alert(`Savaşı Kazandın! Şehir senin oldu! Eski sahibine kuşatma bildirimi gitti.`);
             } else {
                 await fetch(`${firebaseURL}/HaritaSehirler/${sehirIndex}.json`, {
                     method: 'PUT',
                     body: JSON.stringify({ Sahip: eskiSahip, Durum: "Normal", Memnuniyet: 100, Binalar: [] })
                 });
-                alert(`Savaşı Kaybettin! Sahip şehrini savundu. (Sen: ${sayiKurut(savasHasarim)} / Rakip: ${sayiKurut(rakipHasar)})`);
+                alert(`Savaşı Kaybettin! Sahip şehrini savundu.`);
             }
             haritayiGuncelle();
         }
 
-        let aktifKarsiSavasIndex = null;
-        let karsiHasarim = 0;
-        let karsiTimer = null;
-        let karsiRakipHasar = 0;
+        let aktifSavunmaIndex = null;
+        let savunmaHasarim = 0;
+        let savunmaTimer = null;
+        let savunmaRakipHasar = 0;
+        let savunmaMeclisSahip = "";
 
         async function karsiSaldiriKontrolEt() {
             if (!aktifKullanici) return;
@@ -751,32 +820,29 @@
             for (let i = 0; i < 40; i++) {
                 let sehir = data[i];
                 if (sehir && sehir.Durum === "Savunmada" && sehir.Saldirgan === aktifKullanici) {
-                    if (document.getElementById("modalKarsiSavas").classList.contains("hidden")) {
-                        karsiSavasBaslat(i, sehir.RakipHasar, sehir.BitisZamani, sehir.Sahip);
+                    if (document.getElementById("modalKarsiSavas").classList.contains("hidden") && document.getElementById("modalSavunmaSavas").classList.contains("hidden")) {
+                        savunmaModaliniAc(i, sehir.BitisZamani, sehir.Sahip, sehir.RakipHasar);
                     }
                     break;
                 }
             }
         }
 
-        function karsiSavasBaslat(sehirIndex, rakipHasar, bitisZamani, mevcutSahip) {
-            aktifKarsiSavasIndex = sehirIndex;
-            karsiHasarim = 0;
-            karsiRakipHasar = rakipHasar;
-            document.getElementById("karsiSavasHasarim").innerText = "0";
-            document.getElementById("karsiSavasBilgi").innerText = `${sehirIsimleri[sehirIndex]} şehrini geri almak için 1 dakikan ve TEK BİR ATIŞ HAKKIN var!`;
+        function savunmaModaliniAc(sehirIndex, bitisZamani, eskiSahip, rakipHasar) {
+            aktifSavunmaIndex = sehirIndex;
+            savunmaRakipHasar = rakipHasar;
+            savunmaMeclisSahip = eskiSahip;
             document.getElementById("modalKarsiSavas").classList.remove("hidden");
-            document.getElementById("btnKarsiSaldir").disabled = false;
 
-            if (karsiTimer) clearInterval(karsiTimer);
+            if (savunmaTimer) clearInterval(savunmaTimer);
 
-            karsiTimer = setInterval(() => {
+            savunmaTimer = setInterval(() => {
                 let kalanMs = bitisZamani - Date.now();
                 if (kalanMs <= 0) {
-                    clearInterval(karsiTimer);
+                    clearInterval(savunmaTimer);
                     document.getElementById("modalKarsiSavas").classList.add("hidden");
-                    alert("Süre bitti! Tek atış hakkın yandı.");
-                    karsiSavasZamanAsimi(sehirIndex, mevcutSahip);
+                    alert("1 dakikalık süre bitti ve kuşatmayı geri çevirmedin! Şehir tamamen kaybedildi.");
+                    zamanAsimiSehriVer(sehirIndex, eskiSahip);
                 } else {
                     let sn = Math.floor(kalanMs / 1000);
                     document.getElementById("karsiSavasSure").innerText = `Kalan Süre: 0:${sn < 10 ? '0' : ''}${sn}`;
@@ -784,43 +850,57 @@
             }, 1000);
         }
 
-        async function karsiSaldirVur() {
-            // Sadece TEK BİR ATIŞ (Bir kez tıklanınca buton kilitlenir ve skor yazılır)
-            karsiHasarim = getMevcutTikDegeri();
-            document.getElementById("karsiSavasHasarim").innerText = sayiKurut(karsiHasarim);
-            document.getElementById("btnKarsiSaldir").disabled = true;
-
-            clearInterval(karsiTimer);
+        function kusuamayiGeriCevirBaslat() {
+            clearInterval(savunmaTimer);
             document.getElementById("modalKarsiSavas").classList.add("hidden");
 
-            let kazandi = karsiHasarim >= karsiRakipHasar;
-            let yeniSahip = kazandi ? aktifKullanici : (await eskiSahibiGetir(aktifKarsiSavasIndex));
+            savunmaHasarim = 0;
+            document.getElementById("savunmaHasarim").innerText = "0";
+            document.getElementById("modalSavunmaSavas").classList.remove("hidden");
 
-            await fetch(`${firebaseURL}/HaritaSehirler/${aktifKarsiSavasIndex}.json`, {
+            let sure = 10;
+            document.getElementById("savunmaSavasSure").innerText = `Süre: ${sure} sn`;
+
+            let savSuresi = setInterval(() => {
+                sure--;
+                document.getElementById("savunmaSavasSure").innerText = `Süre: ${sure} sn`;
+                if(sure <= 0) {
+                    clearInterval(savSuresi);
+                    savunmaSavasiniBitir();
+                }
+            }, 1000);
+        }
+
+        function savunmaSavasindaTikla() {
+            savunmaHasarim += getMevcutTikDegeri();
+            document.getElementById("savunmaHasarim").innerText = sayiKurut(savunmaHasarim);
+        }
+
+        async function savunmaSavasiniBitir() {
+            document.getElementById("modalSavunmaSavas").classList.add("hidden");
+
+            let kazandi = savunmaHasarim >= savunmaRakipHasar;
+            let yeniSahip = kazandi ? aktifKullanici : savunmaMeclisSahip;
+
+            await fetch(`${firebaseURL}/HaritaSehirler/${aktifSavunmaIndex}.json`, {
                 method: 'PUT',
                 body: JSON.stringify({ Sahip: yeniSahip, Durum: "Normal", Memnuniyet: 100, Binalar: [] })
             });
 
             if (kazandi) {
-                alert(`Tek Atış Başarılı! Şehri geri aldın! (Atışın: ${sayiKurut(karsiHasarim)} / Gerekli: ${sayiKurut(karsiRakipHasar)})`);
+                alert(`Kuşatmayı Başarıyla Geri Çevirdin! Şehir sende kaldı!`);
             } else {
-                alert(`Tek Atış Başarısız! Tek vuruşun yetmedi. Şehir onda kaldı.`);
+                alert(`Savunma Başarısız! Yeterli hasarı veremedin, şehir eski sahibine geçti.`);
             }
             haritayiGuncelle();
         }
 
-        async function karsiSavasZamanAsimi(sehirIndex, mevcutSahip) {
+        async function zamanAsimiSehriVer(sehirIndex, eskiSahip) {
             await fetch(`${firebaseURL}/HaritaSehirler/${sehirIndex}.json`, {
                 method: 'PUT',
-                body: JSON.stringify({ Sahip: mevcutSahip, Durum: "Normal", Memnuniyet: 100, Binalar: [] })
+                body: JSON.stringify({ Sahip: eskiSahip, Durum: "Normal", Memnuniyet: 100, Binalar: [] })
             });
             haritayiGuncelle();
-        }
-
-        async function eskiSahibiGetir(sehirIndex) {
-            let res = await fetch(`${firebaseURL}/HaritaSehirler/${sehirIndex}.json`);
-            let s = await res.json();
-            return s ? s.Sahip : aktifKullanici;
         }
 
         async function arsaVeriYukle() {
@@ -829,42 +909,26 @@
             if (data) {
                 para = data.Para || 0;
                 mevcutSilahSeviyesi = data.SilahSeviyesi || 1;
+                mevcutEsyaSeviyesi = data.EsyaSeviyesi || 0;
             } else {
                 para = 0;
                 mevcutSilahSeviyesi = 1;
+                mevcutEsyaSeviyesi = 0;
             }
             marketleriOlustur();
             arsaGuncelle();
         }
 
         async function paraKazan() {
-            let res = await fetch(`${firebaseURL}/HaritaSehirler.json`);
-            let data = await res.json() || {};
-            let sahipOldugum = 0;
-            for(let i=0; i<40; i++) {
-                if(data[i] && data[i].Sahip === aktifKullanici) sahipOldugum++;
-            }
             let tikDegeri = getMevcutTikDegeri();
             para += tikDegeri;
-
-            // Şehir binalarından ekstra kazanç ekle (her para binası saniyede/tıkta ek kazanç sağlar)
-            for(let i=0; i<40; i++) {
-                if(data[i] && data[i].Sahip === aktifKullanici && data[i].Binalar) {
-                    data[i].Binalar.forEach(bId => {
-                        let bInfo = paraYapilari.find(p => p.id === bId);
-                        if(bInfo) {
-                            para += (tikDegeri * 2 * bInfo.carpantid);
-                        }
-                    });
-                }
-            }
-
             arsaGuncelle();
             arsaKaydet();
         }
 
         function arsaGuncelle() {
             document.getElementById("lblPara").innerText = sayiKurut(para);
+            document.getElementById("lblPasifGelir").innerText = sayiKurut(getToplamPasifGelir());
             document.getElementById("lblVurusGucu").innerText = sayiKurut(getMevcutTikDegeri());
         }
 
@@ -872,7 +936,7 @@
             if (!aktifKullanici) return;
             await fetch(`${firebaseURL}/ArsaOyunu/${aktifKullanici}.json`, {
                 method: 'PUT',
-                body: JSON.stringify({ OyuncuAdi: aktifKullanici, Para: para, SilahSeviyesi: mevcutSilahSeviyesi })
+                body: JSON.stringify({ OyuncuAdi: aktifKullanici, Para: para, SilahSeviyesi: mevcutSilahSeviyesi, EsyaSeviyesi: mevcutEsyaSeviyesi })
             });
         }
 
